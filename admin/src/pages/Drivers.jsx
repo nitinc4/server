@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api, { uploadApi } from '../utils/api';
-import { Truck, Plus, Search, Mail, Phone, Hash, Car, Loader2, CheckCircle2, Trash2, XCircle, MapPin, MapPinOff, RefreshCw, FileText, Calendar, AlertTriangle, ExternalLink, UploadCloud, Check, Download } from 'lucide-react';
+import { Truck, Plus, Search, Mail, Phone, Hash, Car, Loader2, CheckCircle2, Trash2, XCircle, MapPin, MapPinOff, RefreshCw, FileText, Calendar, AlertTriangle, ExternalLink, UploadCloud, Check, Download, Key } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 const Drivers = () => {
@@ -28,6 +28,8 @@ const Drivers = () => {
   const [locationError, setLocationError] = useState(null);
   const [attendance, setAttendance] = useState([]);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   const [newDocData, setNewDocData] = useState({
     name: 'Driving License',
@@ -282,6 +284,24 @@ const Drivers = () => {
     }
   };
 
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.trim() === '') {
+      alert('Please enter a new password');
+      return;
+    }
+    setUpdatingPassword(true);
+    try {
+      await api.put(`/drivers/${selectedDriver._id}`, { password: newPassword });
+      alert('Password updated successfully');
+      setNewPassword('');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update password');
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
   const exportDrivers = () => {
     const exportData = drivers.map(driver => ({
       'Driver ID': driver._id,
@@ -503,6 +523,40 @@ const Drivers = () => {
                     >
                       <MapPin size={12} style={{ filter: 'drop-shadow(0 0 4px #22c55e)' }} />
                       Track Live
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fetchDriverHistory(driver);
+                      }}
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.1)',
+                        border: '1px solid rgba(99, 102, 241, 0.3)',
+                        color: '#6366f1',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        fontWeight: 700,
+                        fontSize: '11px',
+                        transition: 'all 0.2s'
+                      }}
+                      title="Update driver password"
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      <Key size={12} style={{ filter: 'drop-shadow(0 0 4px #6366f1)' }} />
+                      Password
                     </button>
 
                     <button
@@ -878,103 +932,148 @@ const Drivers = () => {
                   )}
                 </div>
 
-                {/* Document Upload/Update Panel */}
-                <form 
-                  onSubmit={handleAddOrUpdateDriverDocument}
-                  style={{
-                    padding: '24px',
-                    borderRadius: '24px',
-                    background: 'var(--card-bg)',
-                    border: '1px solid var(--glass-border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
-                  }}
-                >
-                  <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Upload / Update Document
-                  </div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Document Type</label>
-                    <select
-                      className="input-field"
-                      style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
-                      value={newDocData.name}
-                      onChange={(e) => setNewDocData({ ...newDocData, name: e.target.value })}
-                    >
-                      <option value="Driving License">Driving License</option>
-                      <option value="Aadhaar Card">Aadhaar Card</option>
-                      <option value="PAN Card">PAN Card</option>
-                      <option value="Vehicle Registration">Vehicle RC</option>
-                      <option value="Insurance Policy">Insurance Policy</option>
-                    </select>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Upload File (Image/PDF)</label>
-                    <input 
-                      type="file" 
-                      id="update-doc-file" 
-                      style={{ display: 'none' }} 
-                      onChange={(e) => handleUpdateDocFileChange(e.target.files[0])}
-                      accept="image/*,application/pdf"
-                    />
-                    <label 
-                      htmlFor="update-doc-file"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        background: newDocData.url ? 'rgba(34, 197, 94, 0.1)' : 'var(--input-bg)',
-                        color: newDocData.url ? '#22c55e' : 'var(--text-main)',
-                        border: newDocData.url ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid var(--glass-border)',
-                        padding: '10px',
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        height: '38px'
-                      }}
-                    >
-                      {newDocData.uploading ? (
-                        <Loader2 className="animate-spin" size={16} />
-                      ) : newDocData.url ? (
-                        <>
-                          <Check size={16} style={{ color: '#22c55e' }} /> File Uploaded
-                        </>
-                      ) : (
-                        <>
-                          <UploadCloud size={16} /> Select Document File
-                        </>
-                      )}
-                    </label>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Validity/Expiry Date</label>
-                    <input 
-                      type="date" 
-                      className="input-field" 
-                      style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
-                      value={newDocData.validityDate}
-                      onChange={(e) => setNewDocData({ ...newDocData, validityDate: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    className="btn-primary" 
-                    style={{ height: '38px', fontSize: '12px', marginTop: '6px' }}
-                    disabled={newDocData.uploading}
+                {/* Right sidebar inside grid containing forms */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {/* Document Upload/Update Panel */}
+                  <form 
+                    onSubmit={handleAddOrUpdateDriverDocument}
+                    style={{
+                      padding: '24px',
+                      borderRadius: '24px',
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--glass-border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px',
+                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
+                    }}
                   >
-                    Add / Update Document
-                  </button>
-                </form>
+                    <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Upload / Update Document
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Document Type</label>
+                      <select
+                        className="input-field"
+                        style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
+                        value={newDocData.name}
+                        onChange={(e) => setNewDocData({ ...newDocData, name: e.target.value })}
+                      >
+                        <option value="Driving License">Driving License</option>
+                        <option value="Aadhaar Card">Aadhaar Card</option>
+                        <option value="PAN Card">PAN Card</option>
+                        <option value="Vehicle Registration">Vehicle RC</option>
+                        <option value="Insurance Policy">Insurance Policy</option>
+                      </select>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Upload File (Image/PDF)</label>
+                      <input 
+                        type="file" 
+                        id="update-doc-file" 
+                        style={{ display: 'none' }} 
+                        onChange={(e) => handleUpdateDocFileChange(e.target.files[0])}
+                        accept="image/*,application/pdf"
+                      />
+                      <label 
+                        htmlFor="update-doc-file"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          background: newDocData.url ? 'rgba(34, 197, 94, 0.1)' : 'var(--input-bg)',
+                          color: newDocData.url ? '#22c55e' : 'var(--text-main)',
+                          border: newDocData.url ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid var(--glass-border)',
+                          padding: '10px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          height: '38px'
+                        }}
+                      >
+                        {newDocData.uploading ? (
+                          <Loader2 className="animate-spin" size={16} />
+                        ) : newDocData.url ? (
+                          <>
+                            <Check size={16} style={{ color: '#22c55e' }} /> File Uploaded
+                          </>
+                        ) : (
+                          <>
+                            <UploadCloud size={16} /> Select Document File
+                          </>
+                        )}
+                      </label>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Validity/Expiry Date</label>
+                      <input 
+                        type="date" 
+                        className="input-field" 
+                        style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
+                        value={newDocData.validityDate}
+                        onChange={(e) => setNewDocData({ ...newDocData, validityDate: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      className="btn-primary" 
+                      style={{ height: '38px', fontSize: '12px', marginTop: '6px' }}
+                      disabled={newDocData.uploading}
+                    >
+                      Add / Update Document
+                    </button>
+                  </form>
+
+                  {/* Update Driver Password Panel */}
+                  <form 
+                    onSubmit={handleUpdatePassword}
+                    style={{
+                      padding: '24px',
+                      borderRadius: '24px',
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--glass-border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px',
+                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Key size={16} style={{ color: '#6366f1' }} />
+                      Update Password
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>New Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="Enter new password"
+                        className="input-field" 
+                        style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      className="btn-primary" 
+                      style={{ height: '38px', fontSize: '12px', marginTop: '6px' }}
+                      disabled={updatingPassword}
+                    >
+                      {updatingPassword ? <Loader2 className="animate-spin" size={14} /> : 'Update Password'}
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>

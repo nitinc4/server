@@ -31,6 +31,11 @@ const driverSchema = new mongoose.Schema({
 driverSchema.pre('save', async function() {
   if (!this.isModified('password')) return;
   
+  // Skip if already a bcrypt hash to avoid double-hashing
+  if (this.password && this.password.startsWith('$2') && this.password.length === 60) {
+    return;
+  }
+  
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
