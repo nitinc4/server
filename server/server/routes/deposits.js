@@ -102,6 +102,21 @@ router.get('/my', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/deposits/all/pending
+// @desc    Get all pending deposits (Admin only)
+router.get('/all/pending', protect, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    const { Deposit: DepositModel } = getModels(req);
+    const deposits = await DepositModel.find({ status: 'Pending' }).populate('driverId', 'name phone email').sort({ createdAt: -1 });
+    res.json(deposits);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // @route   GET /api/deposits/admin
 // @desc    Get all deposit requests (Admin only)
 router.get('/admin', protect, async (req, res) => {

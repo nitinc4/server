@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api, { uploadApi, IMAGE_BASE_URL, getImageUrl } from '../utils/api';
-import { 
-  Package, 
-  ChevronLeft, 
-  Upload, 
-  Save, 
-  X, 
-  Info, 
-  Tag, 
-  IndianRupee, 
+import {
+  Package,
+  ChevronLeft,
+  Upload,
+  Save,
+  X,
+  Info,
+  Tag,
+  IndianRupee,
   Layers,
   FileText,
   Boxes,
@@ -106,7 +106,7 @@ const EditProduct = () => {
         setB2bVariants(parsedB2b);
         setB2cVariants(parsedB2c);
         if (p.imageUrl) {
-            setPreviews(prev => ({ ...prev, image: getImageUrl(p.imageUrl) }));
+          setPreviews(prev => ({ ...prev, image: getImageUrl(p.imageUrl) }));
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -186,7 +186,7 @@ const EditProduct = () => {
       }
 
       await api.put(`/products/${id}`, payload);
-      
+
       navigate('/products');
     } catch (err) {
       console.error('Update error:', err);
@@ -207,7 +207,7 @@ const EditProduct = () => {
   const selectedCategory = categories.find(c => String(c._id) === String(formData.categoryId));
 
   const gstPercentNum = Number(formData.gstPercent) || 0;
-  
+
   const regularPriceBase = (Number(formData.price) || 0) * calcQuantity;
   const regularGstAmount = (regularPriceBase * gstPercentNum) / 100;
   const regularPriceTotal = regularPriceBase + regularGstAmount;
@@ -221,14 +221,14 @@ const EditProduct = () => {
       <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '60px' }}>
         {/* Header Section */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '40px' }}>
-          <button 
+          <button
             onClick={() => navigate('/products')}
-            style={{ 
-              width: '45px', 
-              height: '45px', 
-              borderRadius: '15px', 
-              background: 'rgba(255,255,255,0.03)', 
-              border: '1px solid rgba(255,255,255,0.08)', 
+            style={{
+              width: '45px',
+              height: '45px',
+              borderRadius: '15px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
               color: 'var(--text-main)',
               display: 'flex',
               alignItems: 'center',
@@ -246,13 +246,13 @@ const EditProduct = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '32px' 
+        <form onSubmit={handleSubmit} style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '32px'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            
+
             {/* General Information Card */}
             <div className="glass-card" style={{ padding: '35px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.05)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
@@ -265,24 +265,24 @@ const EditProduct = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>Product Name</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
+                  <input
+                    type="text"
+                    className="input-field"
                     placeholder="e.g. Premium Basmati Rice"
                     value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                     required
                     style={{ fontSize: '16px', padding: '15px 20px' }}
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>Product Description</label>
-                  <textarea 
-                    className="input-field" 
+                  <textarea
+                    className="input-field"
                     style={{ minHeight: '160px', resize: 'vertical', padding: '15px 20px', fontSize: '15px', lineHeight: '1.6' }}
                     placeholder="Describe the features, benefits, and specifications..."
                     value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    onChange={e => setFormData({ ...formData, description: e.target.value })}
                     required
                   />
                 </div>
@@ -299,44 +299,48 @@ const EditProduct = () => {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '25px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>B2C Price (Base ₹)</label>
-                  <div style={{ position: 'relative' }}>
-                    <IndianRupee size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-                    <input 
-                      type="number" 
-                      className="input-field" 
-                      style={{ paddingLeft: '42px' }}
-                      placeholder="0.00"
-                      value={formData.price}
-                      onChange={e => setFormData({...formData, price: e.target.value})}
-                      required
-                    />
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>B2B Price (Base ₹)</label>
-                  <div style={{ position: 'relative' }}>
-                    <IndianRupee size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-                    <input 
-                      type="number" 
-                      className="input-field" 
-                      style={{ paddingLeft: '42px' }}
-                      placeholder="0.00"
-                      value={formData.b2bPrice}
-                      onChange={e => setFormData({...formData, b2bPrice: e.target.value})}
-                      required
-                    />
-                  </div>
-                </div>
+                {!(b2cVariants.length > 0 || b2bVariants.length > 0) && (
+                  <>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>B2C Price (Base ₹)</label>
+                      <div style={{ position: 'relative' }}>
+                        <IndianRupee size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                        <input
+                          type="number"
+                          className="input-field"
+                          style={{ paddingLeft: '42px' }}
+                          placeholder="0.00"
+                          value={formData.price}
+                          onChange={e => setFormData({ ...formData, price: e.target.value })}
+                          required={!(b2cVariants.length > 0 || b2bVariants.length > 0)}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>B2B Price (Base ₹)</label>
+                      <div style={{ position: 'relative' }}>
+                        <IndianRupee size={16} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                        <input
+                          type="number"
+                          className="input-field"
+                          style={{ paddingLeft: '42px' }}
+                          placeholder="0.00"
+                          value={formData.b2bPrice}
+                          onChange={e => setFormData({ ...formData, b2bPrice: e.target.value })}
+                          required={!(b2cVariants.length > 0 || b2bVariants.length > 0)}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>GST Rate (%)</label>
-                  <input 
-                    type="number" 
-                    className="input-field" 
+                  <input
+                    type="number"
+                    className="input-field"
                     placeholder="e.g. 18"
                     value={formData.gstPercent}
-                    onChange={e => setFormData({...formData, gstPercent: e.target.value})}
+                    onChange={e => setFormData({ ...formData, gstPercent: e.target.value })}
                     required
                     min="0"
                     max="100"
@@ -347,23 +351,23 @@ const EditProduct = () => {
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>Stock Quantity</label>
                   <div style={{ position: 'relative' }}>
                     <Boxes size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-                    <input 
-                      type="number" 
-                      className="input-field" 
+                    <input
+                      type="number"
+                      className="input-field"
                       style={{ paddingLeft: '45px' }}
                       placeholder="0"
                       value={formData.stock}
-                      onChange={e => setFormData({...formData, stock: e.target.value})}
+                      onChange={e => setFormData({ ...formData, stock: e.target.value })}
                       required
                     />
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>Unit Type</label>
-                  <select 
-                    className="input-field" 
+                  <select
+                    className="input-field"
                     value={formData.unit}
-                    onChange={e => setFormData({...formData, unit: e.target.value})}
+                    onChange={e => setFormData({ ...formData, unit: e.target.value })}
                     required
                     style={{ height: '50px', cursor: 'pointer' }}
                   >
@@ -376,34 +380,34 @@ const EditProduct = () => {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>MOQ</label>
-                  <input 
-                    type="number" 
-                    className="input-field" 
+                  <input
+                    type="number"
+                    className="input-field"
                     placeholder="1"
                     value={formData.moq}
-                    onChange={e => setFormData({...formData, moq: e.target.value})}
+                    onChange={e => setFormData({ ...formData, moq: e.target.value })}
                     required
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <label style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-dim)' }}>SKU (Optional)</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
+                  <input
+                    type="text"
+                    className="input-field"
                     placeholder="SKU-XYZ-001"
                     value={formData.sku}
-                    onChange={e => setFormData({...formData, sku: e.target.value})}
+                    onChange={e => setFormData({ ...formData, sku: e.target.value })}
                   />
                 </div>
               </div>
 
               {/* Pricing Breakdown Hint */}
               {(formData.price || formData.b2bPrice) && (
-                <div style={{ 
-                  marginTop: '25px', 
-                  padding: '24px', 
-                  borderRadius: '20px', 
-                  background: 'rgba(99, 102, 241, 0.05)', 
+                <div style={{
+                  marginTop: '25px',
+                  padding: '24px',
+                  borderRadius: '20px',
+                  background: 'rgba(99, 102, 241, 0.05)',
                   border: '1px solid rgba(99, 102, 241, 0.1)',
                   fontSize: '13px',
                   lineHeight: '1.6',
@@ -418,11 +422,11 @@ const EditProduct = () => {
                       <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-dim)' }}>
                         Simulate Weight/Quantity:
                       </span>
-                      <select 
-                        value={calcQuantity} 
+                      <select
+                        value={calcQuantity}
                         onChange={e => setCalcQuantity(Number(e.target.value))}
-                        style={{ 
-                          background: 'rgba(255,255,255,0.03)', 
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
                           border: '1px solid rgba(255,255,255,0.08)',
                           color: 'var(--text-main)',
                           borderRadius: '8px',
@@ -460,94 +464,99 @@ const EditProduct = () => {
                 </div>
               )}
 
-              {/* B2C Size Variants Section */}
-              <div style={{ marginTop: '30px', borderTop: '1px solid var(--glass-border)', paddingTop: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>B2C Size Variants</h4>
-                  <button type="button" onClick={handleAddB2c} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Plus size={16} /> Add B2C Variant
-                  </button>
-                </div>
-                {b2cVariants.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {b2cVariants.map((variant, index) => (
-                      <div key={index} style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '15px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ flex: 1.5 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>Size Value *</label>
-                          <input type="number" className="input-field" value={variant.packetSizeVal} onChange={(e) => handleB2cChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500 or 1" required min="0" step="0.01" />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>Unit *</label>
-                          <select className="input-field" value={variant.packetSizeUnit} onChange={(e) => handleB2cChange(index, 'packetSizeUnit', e.target.value)} required style={{ height: '48px', cursor: 'pointer' }}>
-                            <option value="g">g</option>
-                            <option value="kg">kg</option>
-                            <option value="ltr">ltr</option>
-                            <option value="ml">ml</option>
-                          </select>
-                        </div>
-                        <div style={{ flex: 1.5 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>B2C Price (₹) *</label>
-                          <input type="number" className="input-field" value={variant.price} onChange={(e) => handleB2cChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
-                        </div>
-                        <div style={{ flex: 1.2 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>Stock *</label>
-                          <input type="number" className="input-field" value={variant.stock} onChange={(e) => handleB2cChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
-                        </div>
-                        <button type="button" onClick={() => handleRemoveB2c(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '12px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                          <Trash2 size={20} />
-                        </button>
+              {/* B2C & B2B Size Variants Sections */}
+              {(b2cVariants.length > 0 || b2bVariants.length > 0) && (
+                <>
+                  {/* B2C Size Variants Section */}
+                  <div style={{ marginTop: '30px', borderTop: '1px solid var(--glass-border)', paddingTop: '30px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>B2C Size Variants</h4>
+                      <button type="button" onClick={handleAddB2c} style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Plus size={16} /> Add B2C Variant
+                      </button>
+                    </div>
+                    {b2cVariants.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {b2cVariants.map((variant, index) => (
+                          <div key={index} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ flex: 1.5 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>Size Value *</label>
+                              <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.packetSizeVal} onChange={(e) => handleB2cChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500" required min="0" step="0.01" />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>Unit *</label>
+                              <select className="input-field" value={variant.packetSizeUnit} onChange={(e) => handleB2cChange(index, 'packetSizeUnit', e.target.value)} required style={{ height: '36px', padding: '0 8px', fontSize: '13px', cursor: 'pointer' }}>
+                                <option value="g">g</option>
+                                <option value="kg">kg</option>
+                                <option value="ltr">ltr</option>
+                                <option value="ml">ml</option>
+                              </select>
+                            </div>
+                            <div style={{ flex: 1.5 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>B2C Price (₹) *</label>
+                              <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.price} onChange={(e) => handleB2cChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
+                            </div>
+                            <div style={{ flex: 1.2 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>Stock *</label>
+                              <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.stock} onChange={(e) => handleB2cChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
+                            </div>
+                            <button type="button" onClick={() => handleRemoveB2c(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer', height: '36px', display: 'flex', alignItems: 'center' }}>
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* B2B Size Variants Section */}
-              <div style={{ marginTop: '30px', borderTop: '1px solid var(--glass-border)', paddingTop: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>B2B Size Variants</h4>
-                  <button type="button" onClick={handleAddB2b} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Plus size={16} /> Add B2B Variant
-                  </button>
-                </div>
-                {b2bVariants.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {b2bVariants.map((variant, index) => (
-                      <div key={index} style={{ display: 'flex', gap: '15px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '15px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ flex: 1.5 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>Size Value *</label>
-                          <input type="number" className="input-field" value={variant.packetSizeVal} onChange={(e) => handleB2bChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500 or 1" required min="0" step="0.01" />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>Unit *</label>
-                          <select className="input-field" value={variant.packetSizeUnit} onChange={(e) => handleB2bChange(index, 'packetSizeUnit', e.target.value)} required style={{ height: '48px', cursor: 'pointer' }}>
-                            <option value="g">g</option>
-                            <option value="kg">kg</option>
-                            <option value="ltr">ltr</option>
-                            <option value="ml">ml</option>
-                          </select>
-                        </div>
-                        <div style={{ flex: 1.5 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>B2B Price (₹) *</label>
-                          <input type="number" className="input-field" value={variant.price} onChange={(e) => handleB2bChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required style={{ height: '48px' }} />
-                        </div>
-                        <div style={{ flex: 1.2 }}>
-                          <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', fontWeight: 600 }}>Stock *</label>
-                          <input type="number" className="input-field" value={variant.stock} onChange={(e) => handleB2bChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required style={{ height: '48px' }} />
-                        </div>
-                        <button type="button" onClick={() => handleRemoveB2b(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '12px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                          <Trash2 size={20} />
-                        </button>
+                  {/* B2B Size Variants Section */}
+                  <div style={{ marginTop: '30px', borderTop: '1px solid var(--glass-border)', paddingTop: '30px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)' }}>B2B Size Variants</h4>
+                      <button type="button" onClick={handleAddB2b} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: 'none', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Plus size={16} /> Add B2B Variant
+                      </button>
+                    </div>
+                    {b2bVariants.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {b2bVariants.map((variant, index) => (
+                          <div key={index} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ flex: 1.5 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>Size Value *</label>
+                              <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.packetSizeVal} onChange={(e) => handleB2bChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500" required min="0" step="0.01" />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>Unit *</label>
+                              <select className="input-field" value={variant.packetSizeUnit} onChange={(e) => handleB2bChange(index, 'packetSizeUnit', e.target.value)} required style={{ height: '36px', padding: '0 8px', fontSize: '13px', cursor: 'pointer' }}>
+                                <option value="g">g</option>
+                                <option value="kg">kg</option>
+                                <option value="ltr">ltr</option>
+                                <option value="ml">ml</option>
+                              </select>
+                            </div>
+                            <div style={{ flex: 1.5 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>B2B Price (₹) *</label>
+                              <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.price} onChange={(e) => handleB2bChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
+                            </div>
+                            <div style={{ flex: 1.2 }}>
+                              <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>Stock *</label>
+                              <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.stock} onChange={(e) => handleB2bChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
+                            </div>
+                            <button type="button" onClick={() => handleRemoveB2b(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer', height: '36px', display: 'flex', alignItems: 'center' }}>
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            
+
             {/* Media Card */}
             <div className="glass-card" style={{ padding: '30px', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.05)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '25px' }}>
@@ -558,9 +567,9 @@ const EditProduct = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div 
+                <div
                   onClick={() => document.getElementById('image-upload').click()}
-                  style={{ 
+                  style={{
                     width: '100%',
                     aspectRatio: '1',
                     borderRadius: '24px',
@@ -587,12 +596,12 @@ const EditProduct = () => {
                     </>
                   )}
                   {previews.image && (
-                    <div style={{ 
-                      position: 'absolute', 
-                      inset: 0, 
-                      background: 'rgba(0,0,0,0.4)', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(0,0,0,0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       opacity: 0,
                       transition: 'opacity 0.3s'
@@ -617,10 +626,10 @@ const EditProduct = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-dim)' }}>Category</label>
-                  <select 
+                  <select
                     className="input-field"
                     value={formData.categoryId}
-                    onChange={e => setFormData({...formData, categoryId: e.target.value, subCategoryId: ''})}
+                    onChange={e => setFormData({ ...formData, categoryId: e.target.value, subCategoryId: '' })}
                     required
                     style={{ height: '50px', cursor: 'pointer' }}
                   >
@@ -632,10 +641,10 @@ const EditProduct = () => {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-dim)' }}>Sub-Category</label>
-                  <select 
+                  <select
                     className="input-field"
                     value={formData.subCategoryId}
-                    onChange={e => setFormData({...formData, subCategoryId: e.target.value})}
+                    onChange={e => setFormData({ ...formData, subCategoryId: e.target.value })}
                     disabled={!formData.categoryId}
                     style={{ height: '50px', cursor: 'pointer' }}
                   >
@@ -652,24 +661,24 @@ const EditProduct = () => {
         </form>
 
         {/* Bottom Actions */}
-        <div style={{ 
-          marginTop: '40px', 
-          padding: '24px', 
-          borderRadius: '24px', 
-          background: 'var(--card-bg)', 
+        <div style={{
+          marginTop: '40px',
+          padding: '24px',
+          borderRadius: '24px',
+          background: 'var(--card-bg)',
           border: '1px solid rgba(255,255,255,0.05)',
           display: 'flex',
           justifyContent: 'flex-end',
           gap: '16px',
           flexWrap: 'wrap'
         }}>
-          <button 
+          <button
             onClick={() => navigate('/products')}
-            style={{ 
-              padding: '12px 32px', 
-              borderRadius: '15px', 
-              background: 'transparent', 
-              border: '1px solid var(--glass-border)', 
+            style={{
+              padding: '12px 32px',
+              borderRadius: '15px',
+              background: 'transparent',
+              border: '1px solid var(--glass-border)',
               color: 'var(--text-dim)',
               fontWeight: 600,
               cursor: 'pointer',
@@ -679,9 +688,9 @@ const EditProduct = () => {
           >
             Cancel
           </button>
-          <button 
+          <button
             onClick={handleSubmit}
-            className="btn-primary" 
+            className="btn-primary"
             style={{ padding: '12px 48px', borderRadius: '15px', flex: '2', minWidth: '200px' }}
             disabled={loading}
           >

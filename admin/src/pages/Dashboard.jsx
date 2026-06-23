@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { 
-  Package, Layers, Truck, Users, TrendingUp, ShoppingBag, 
-  CheckCircle, DollarSign, Store, FileText, Download, 
+import {
+  Package, Layers, Truck, Users, TrendingUp, ShoppingBag,
+  CheckCircle, DollarSign, Store, FileText, Download,
   ArrowUpRight, ArrowDownRight, Activity, ShieldAlert, MapPin
 } from 'lucide-react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
-  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
 import * as XLSX from 'xlsx';
 
@@ -36,8 +36,8 @@ const StatCard = ({ title, value, subValue, icon: Icon, color, trend }) => (
 );
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({ 
-    products: 0, categories: 0, drivers: 0, deliveries: 0, 
+  const [stats, setStats] = useState({
+    products: 0, categories: 0, drivers: 0, deliveries: 0,
     pendingPayments: 0, sellers: 0, b2bOrders: 0, b2cOrders: 0,
     totalRevenue: 0, locations: 0
   });
@@ -64,12 +64,12 @@ const Dashboard = () => {
         hasPerm('manage_sellers') ? api.get('/sellers') : Promise.resolve({ data: [] }),
         hasPerm('manage_locations') ? api.get('/locations') : Promise.resolve({ data: [] })
       ]);
-      
+
       const [p, c, d, o, s, l] = results.map(r => r.status === 'fulfilled' ? r.value : { data: [] });
-      
+
       const productsList = p.data;
       const ordersList = o.data;
-      
+
       const deliveries = ordersList.filter(order => order.orderStatus === 'Delivered').length;
       const pendingPayments = ordersList.filter(order => order.paymentStatus === 'Pending').length;
       const b2bOrders = ordersList.filter(order => order.userId?.role === 'b2b').length;
@@ -141,7 +141,7 @@ const Dashboard = () => {
       ['Inventory Depth', stats.products],
       ['Active Locations', stats.locations]
     ];
-    
+
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sales Report");
@@ -159,9 +159,9 @@ const Dashboard = () => {
             Synchronized data from {stats.locations} active business zones
           </p>
         </div>
-        <button 
+        <button
           onClick={exportToExcel}
-          className="btn-primary" 
+          className="btn-primary"
           style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--glass-bg)', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}
         >
           <Download size={18} />
@@ -174,11 +174,11 @@ const Dashboard = () => {
         {hasPerm('manage_orders') && (
           <StatCard title="Sales Revenue" value={`₹${stats.totalRevenue.toLocaleString()}`} icon={DollarSign} color="#6366f1" trend={12} />
         )}
-        
+
         {hasPerm('manage_orders') && (!user.targetSegment || user.targetSegment === 'Both' || user.targetSegment === 'B2B') && (
           <StatCard title="B2B Traction" value={stats.b2bOrders} subValue="Orders" icon={ShoppingBag} color="#8b5cf6" trend={8} />
         )}
-        
+
         {hasPerm('manage_sellers') && (
           <StatCard title="Partner Network" value={stats.sellers} subValue="Active Sellers" icon={Store} color="#f59e0b" trend={15} />
         )}
@@ -227,7 +227,7 @@ const Dashboard = () => {
                 <LineChart data={revenueData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
                   <XAxis dataKey="name" stroke="var(--text-dim)" axisLine={false} tickLine={false} />
-                  <YAxis stroke="var(--text-dim)" axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
+                  <YAxis stroke="var(--text-dim)" axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
                   <Tooltip contentStyle={{ background: 'var(--bg-sidebar)', border: '1px solid var(--glass-border)', borderRadius: '12px' }} />
                   <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={3} dot={{ fill: '#6366f1', strokeWidth: 2, r: 4 }} />
                 </LineChart>

@@ -57,36 +57,36 @@ const Drivers = () => {
     if (!validityDate) return { label: 'No Expiry', color: 'var(--text-dim)', bg: 'rgba(148, 163, 184, 0.1)' };
     const expiry = new Date(validityDate);
     const today = new Date();
-    today.setHours(0,0,0,0);
-    
+    today.setHours(0, 0, 0, 0);
+
     if (expiry < today) {
       return { label: 'Expired', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' };
     }
-    
+
     const diffTime = expiry - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays <= 30) {
       return { label: `Expiring in ${diffDays} days`, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' };
     }
-    
+
     return { label: 'Valid / Active', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.1)' };
   };
 
   const handleDocFileChange = async (index, file) => {
     if (!file) return;
-    
+
     const updatedDocs = [...formData.documents];
     updatedDocs[index].uploading = true;
     setFormData({ ...formData, documents: updatedDocs });
-    
+
     try {
       const fileData = new FormData();
       fileData.append('file', file);
       const uploadRes = await uploadApi.post('/upload', fileData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
+
       const newDocs = [...formData.documents];
       newDocs[index].url = uploadRes.data.url;
       newDocs[index].uploading = false;
@@ -146,7 +146,7 @@ const Drivers = () => {
       alert('Please select a validity/expiry date');
       return;
     }
-    
+
     try {
       const updatedDocs = [...(selectedDriver.documents || [])];
       const existingIdx = updatedDocs.findIndex(d => d.name === newDocData.name);
@@ -165,7 +165,7 @@ const Drivers = () => {
           status: 'approved'
         });
       }
-      
+
       const { data } = await api.put(`/drivers/${selectedDriver._id}`, { documents: updatedDocs });
       setSelectedDriver(data);
       setNewDocData({ name: 'Driving License', url: '', validityDate: '', uploading: false });
@@ -192,7 +192,12 @@ const Drivers = () => {
     setLocationError(null);
     try {
       const { data } = await api.get(`/drivers/${driverId}/location`);
-      setDriverLocation(data);
+      if (data && data.active === false) {
+        setLocationError(data.message || 'Live tracking is only active when the driver is delivering an active (Picked Up or Out for Delivery) order.');
+        setDriverLocation(null);
+      } else {
+        setDriverLocation(data);
+      }
     } catch (err) {
       console.error('Failed to fetch driver live location', err);
       setLocationError(err.response?.data?.message || 'Driver live location is not available right now.');
@@ -329,16 +334,16 @@ const Drivers = () => {
           <input type="text" placeholder="Search drivers..." className="input-field" style={{ paddingLeft: '40px', paddingBottom: '10px', paddingTop: '10px' }} />
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button 
-            onClick={exportDrivers} 
-            className="btn-primary" 
-            style={{ 
-              background: 'var(--glass-bg)', 
-              color: 'var(--text-main)', 
-              border: '1px solid var(--glass-border)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px' 
+          <button
+            onClick={exportDrivers}
+            className="btn-primary"
+            style={{
+              background: 'var(--glass-bg)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--glass-border)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
             <Download size={18} /> Export
@@ -414,7 +419,7 @@ const Drivers = () => {
                         const status = getDocumentStatus(d.validityDate);
                         return status.label.startsWith('Expiring');
                       });
-                      
+
                       if (expiredDocs.length > 0) {
                         return (
                           <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -735,7 +740,7 @@ const Drivers = () => {
                         const isWorking = day.deliveriesCompleted > 0 && day.deliveriesCompleted < 5;
 
                         return (
-                          <div 
+                          <div
                             key={idx}
                             style={{
                               display: 'flex',
@@ -755,12 +760,12 @@ const Drivers = () => {
                             <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-main)', marginTop: '2px' }}>
                               {dateObj.toLocaleDateString('en-US', { day: 'numeric' })}
                             </span>
-                            
-                            <div 
-                              style={{ 
-                                width: '28px', 
-                                height: '28px', 
-                                borderRadius: '50%', 
+
+                            <div
+                              style={{
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '50%',
                                 background: isPresent ? 'rgba(34, 197, 94, 0.15)' : isWorking ? 'rgba(234, 179, 8, 0.15)' : 'rgba(255,255,255,0.02)',
                                 border: `1.5px solid ${isPresent ? '#22c55e' : isWorking ? '#eab308' : 'var(--glass-border)'}`,
                                 display: 'flex',
@@ -775,11 +780,11 @@ const Drivers = () => {
                             >
                               {day.deliveriesCompleted}
                             </div>
-                            
-                            <span 
-                              style={{ 
-                                fontSize: '8px', 
-                                fontWeight: 800, 
+
+                            <span
+                              style={{
+                                fontSize: '8px',
+                                fontWeight: 800,
                                 color: isPresent ? '#22c55e' : isWorking ? '#eab308' : 'var(--text-dim)',
                                 textTransform: 'uppercase',
                                 marginTop: '6px'
@@ -859,7 +864,7 @@ const Drivers = () => {
                       {selectedDriver.documents.map((doc, idx) => {
                         const validity = getDocumentStatus(doc.validityDate);
                         return (
-                          <div 
+                          <div
                             key={idx}
                             style={{
                               padding: '16px',
@@ -886,7 +891,7 @@ const Drivers = () => {
                                   </div>
                                 </div>
                               </div>
-                              <button 
+                              <button
                                 onClick={() => handleDeleteDriverDocument(doc.name)}
                                 style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                 onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
@@ -907,11 +912,11 @@ const Drivers = () => {
                               }}>
                                 {validity.label.toUpperCase()}
                               </span>
-                              
-                              <a 
-                                href={doc.url} 
-                                target="_blank" 
-                                rel="noreferrer" 
+
+                              <a
+                                href={doc.url}
+                                target="_blank"
+                                rel="noreferrer"
                                 style={{
                                   display: 'flex',
                                   alignItems: 'center',
@@ -933,30 +938,30 @@ const Drivers = () => {
                 </div>
 
                 {/* Right sidebar inside grid containing forms */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                   {/* Document Upload/Update Panel */}
-                  <form 
+                  <form
                     onSubmit={handleAddOrUpdateDriverDocument}
                     style={{
-                      padding: '16px',
-                      borderRadius: '16px',
+                      padding: '24px',
+                      borderRadius: '24px',
                       background: 'var(--card-bg)',
                       border: '1px solid var(--glass-border)',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '10px',
+                      gap: '16px',
                       boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
                     }}
                   >
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Upload / Update Document
                     </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Document Type</label>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Document Type</label>
                       <select
                         className="input-field"
-                        style={{ fontSize: '11px', height: '32px', padding: '0 8px' }}
+                        style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
                         value={newDocData.name}
                         onChange={(e) => setNewDocData({ ...newDocData, name: e.target.value })}
                       >
@@ -968,64 +973,64 @@ const Drivers = () => {
                       </select>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Upload File (Image/PDF)</label>
-                      <input 
-                        type="file" 
-                        id="update-doc-file" 
-                        style={{ display: 'none' }} 
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Upload File (Image/PDF)</label>
+                      <input
+                        type="file"
+                        id="update-doc-file"
+                        style={{ display: 'none' }}
                         onChange={(e) => handleUpdateDocFileChange(e.target.files[0])}
                         accept="image/*,application/pdf"
                       />
-                      <label 
+                      <label
                         htmlFor="update-doc-file"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '6px',
+                          gap: '8px',
                           background: newDocData.url ? 'rgba(34, 197, 94, 0.1)' : 'var(--input-bg)',
                           color: newDocData.url ? '#22c55e' : 'var(--text-main)',
                           border: newDocData.url ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid var(--glass-border)',
-                          padding: '6px 8px',
-                          borderRadius: '8px',
-                          fontSize: '11px',
+                          padding: '10px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
                           fontWeight: 600,
                           cursor: 'pointer',
                           transition: 'all 0.2s',
-                          height: '32px'
+                          height: '38px'
                         }}
                       >
                         {newDocData.uploading ? (
-                          <Loader2 className="animate-spin" size={14} />
+                          <Loader2 className="animate-spin" size={16} />
                         ) : newDocData.url ? (
                           <>
-                            <Check size={14} style={{ color: '#22c55e' }} /> File Uploaded
+                            <Check size={16} style={{ color: '#22c55e' }} /> File Uploaded
                           </>
                         ) : (
                           <>
-                            <UploadCloud size={14} /> Select File
+                            <UploadCloud size={16} /> Select Document File
                           </>
                         )}
                       </label>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Validity/Expiry Date</label>
-                      <input 
-                        type="date" 
-                        className="input-field" 
-                        style={{ fontSize: '11px', height: '32px', padding: '0 8px' }}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Validity/Expiry Date</label>
+                      <input
+                        type="date"
+                        className="input-field"
+                        style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
                         value={newDocData.validityDate}
                         onChange={(e) => setNewDocData({ ...newDocData, validityDate: e.target.value })}
                         required
                       />
                     </div>
 
-                    <button 
-                      type="submit" 
-                      className="btn-primary" 
-                      style={{ height: '32px', fontSize: '11px', marginTop: '4px' }}
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      style={{ height: '38px', fontSize: '12px', marginTop: '6px' }}
                       disabled={newDocData.uploading}
                     >
                       Add / Update Document
@@ -1033,44 +1038,44 @@ const Drivers = () => {
                   </form>
 
                   {/* Update Driver Password Panel */}
-                  <form 
+                  <form
                     onSubmit={handleUpdatePassword}
                     style={{
-                      padding: '16px',
-                      borderRadius: '16px',
+                      padding: '24px',
+                      borderRadius: '24px',
                       background: 'var(--card-bg)',
                       border: '1px solid var(--glass-border)',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '10px',
+                      gap: '16px',
                       boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)'
                     }}
                   >
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Key size={14} style={{ color: '#6366f1' }} />
+                    <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Key size={16} style={{ color: '#6366f1' }} />
                       Update Password
                     </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>New Password</label>
-                      <input 
-                        type="password" 
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>New Password</label>
+                      <input
+                        type="password"
                         placeholder="Enter new password"
-                        className="input-field" 
-                        style={{ fontSize: '11px', height: '32px', padding: '0 8px' }}
+                        className="input-field"
+                        style={{ fontSize: '12px', height: '38px', padding: '0 12px' }}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
                       />
                     </div>
 
-                    <button 
-                      type="submit" 
-                      className="btn-primary" 
-                      style={{ height: '32px', fontSize: '11px', marginTop: '4px' }}
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      style={{ height: '38px', fontSize: '12px', marginTop: '6px' }}
                       disabled={updatingPassword}
                     >
-                      {updatingPassword ? <Loader2 className="animate-spin" size={12} /> : 'Update Password'}
+                      {updatingPassword ? <Loader2 className="animate-spin" size={14} /> : 'Update Password'}
                     </button>
                   </form>
                 </div>
@@ -1087,70 +1092,93 @@ const Drivers = () => {
           background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100
         }}>
-          <div className="glass" style={{ width: '100%', maxWidth: '500px', padding: '20px', borderRadius: '20px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Register New Driver</h3>
+          <div className="glass" style={{ width: '100%', maxWidth: '750px', padding: '24px', borderRadius: '24px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: 'var(--text-main)' }}>Register New Driver</h3>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <input
-                  type="text" placeholder="Full Name" className="input-field" required
-                  style={{ flex: 1, height: '36px', fontSize: '12px', padding: '0 12px' }}
-                  value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-                <input
-                  type="tel" placeholder="Phone Number" className="input-field" required
-                  style={{ flex: 1, height: '36px', fontSize: '12px', padding: '0 12px' }}
-                  value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
+              
+              {/* Form Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>Full Name</label>
+                  <input
+                    type="text" placeholder="Full Name" className="input-field" required
+                    style={{ height: '38px', fontSize: '13px', padding: '0 12px' }}
+                    value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>Phone Number</label>
+                  <input
+                    type="tel" placeholder="Phone Number" className="input-field" required
+                    style={{ height: '38px', fontSize: '13px', padding: '0 12px' }}
+                    value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>Email Address (Optional)</label>
+                  <input
+                    type="email" placeholder="Email Address (Optional)" className="input-field"
+                    style={{ height: '38px', fontSize: '13px', padding: '0 12px' }}
+                    value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>Driver App Password</label>
+                  <input
+                    type="password" placeholder="Driver App Password" className="input-field" required
+                    style={{ height: '38px', fontSize: '13px', padding: '0 12px' }}
+                    value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>License Number</label>
+                  <input
+                    type="text" placeholder="License Number" className="input-field" required
+                    style={{ height: '38px', fontSize: '13px', padding: '0 12px' }}
+                    value={formData.licenseNumber} onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>Driver Classification</label>
+                  <select
+                    className="input-field"
+                    style={{ height: '38px', fontSize: '13px', padding: '0 12px', background: 'var(--input-bg)', color: 'var(--text-main)' }}
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  >
+                    <option value="B2C" style={{ background: 'var(--bg-sidebar)' }}>B2C Driver (Direct to Customer)</option>
+                    <option value="B2B" style={{ background: 'var(--bg-sidebar)' }}>B2B Driver (Business Deliveries)</option>
+                  </select>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <input
-                  type="email" placeholder="Email Address (Optional)" className="input-field"
-                  style={{ flex: 1, height: '36px', fontSize: '12px', padding: '0 12px' }}
-                  value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-                <input
-                  type="password" placeholder="App Password" className="input-field" required
-                  style={{ flex: 1, height: '36px', fontSize: '12px', padding: '0 12px' }}
-                  value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <input
-                  type="text" placeholder="License Number" className="input-field" required
-                  style={{ flex: 1, height: '36px', fontSize: '12px', padding: '0 12px' }}
-                  value={formData.licenseNumber} onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                />
-                <select
-                  className="input-field"
-                  style={{ flex: 1, height: '36px', fontSize: '12px', background: 'var(--input-bg)', color: 'var(--text-main)', padding: '0 8px' }}
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                >
-                  <option value="B2C" style={{ background: 'var(--bg-sidebar)' }}>B2C Driver</option>
-                  <option value="B2B" style={{ background: 'var(--bg-sidebar)' }}>B2B Driver</option>
-                </select>
-              </div>
-              <input
-                type="text" placeholder="Vehicle Details (Model, Plate No.)" className="input-field" required
-                style={{ height: '36px', fontSize: '12px', padding: '0 12px' }}
-                value={formData.vehicleDetails} onChange={(e) => setFormData({ ...formData, vehicleDetails: e.target.value })}
-              />
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--input-bg)', borderRadius: '10px' }}>
-                <label htmlFor="cashManagement" style={{ fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>Enable Cash Management</label>
-                <input
-                  type="checkbox"
-                  id="cashManagement"
-                  checked={formData.cashManagement}
-                  onChange={(e) => setFormData({ ...formData, cashManagement: e.target.checked })}
-                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-dim)' }}>Vehicle Details (Model, Plate No.)</label>
+                  <textarea
+                    placeholder="Vehicle Details (Model, Plate No.)" className="input-field" style={{ minHeight: '60px', height: '60px', fontSize: '13px', padding: '8px 12px' }} required
+                    value={formData.vehicleDetails} onChange={(e) => setFormData({ ...formData, vehicleDetails: e.target.value })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', background: 'var(--input-bg)', borderRadius: '12px', height: '60px', marginTop: '16px', border: '1px solid var(--glass-border)' }}>
+                    <input
+                      type="checkbox"
+                      id="cashManagement"
+                      checked={formData.cashManagement}
+                      onChange={(e) => setFormData({ ...formData, cashManagement: e.target.checked })}
+                      style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="cashManagement" style={{ fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)' }}>Enable Cash Management</label>
+                  </div>
+                </div>
               </div>
 
               {/* Documents Section */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px', background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px', background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <FileText size={12} style={{ color: '#6366f1' }} />
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FileText size={13} style={{ color: '#6366f1' }} />
                     Driver Documents
                   </label>
                   <button
@@ -1160,7 +1188,7 @@ const Drivers = () => {
                       background: 'rgba(99, 102, 241, 0.1)',
                       border: 'none',
                       color: '#6366f1',
-                      padding: '3px 8px',
+                      padding: '4px 8px',
                       borderRadius: '6px',
                       fontSize: '10px',
                       fontWeight: 700,
@@ -1173,22 +1201,22 @@ const Drivers = () => {
                     onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)'}
                     onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)'}
                   >
-                    <Plus size={10} /> Add
+                    <Plus size={10} /> Add Document
                   </button>
                 </div>
 
                 {formData.documents.length === 0 ? (
-                  <div style={{ padding: '8px', textAlign: 'center', color: 'var(--text-dim)', fontSize: '11px', border: '1px dashed var(--glass-border)', borderRadius: '6px' }}>
+                  <div style={{ padding: '8px', textAlign: 'center', color: 'var(--text-dim)', fontSize: '11px', border: '1px dashed var(--glass-border)', borderRadius: '8px' }}>
                     No documents attached.
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '150px', overflowY: 'auto', paddingRight: '4px' }}>
                     {formData.documents.map((doc, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '8px', background: 'var(--input-bg)', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '10px', background: 'var(--input-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                           <select
                             className="input-field"
-                            style={{ flex: 2, fontSize: '11px', height: '30px', padding: '0 6px' }}
+                            style={{ flex: 2, fontSize: '11px', height: '32px', padding: '0 8px' }}
                             value={doc.name}
                             onChange={(e) => updateDocumentField(idx, 'name', e.target.value)}
                           >
@@ -1207,7 +1235,7 @@ const Drivers = () => {
                           </button>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <div style={{ flex: 1, position: 'relative' }}>
                             <input
                               type="file"
@@ -1222,17 +1250,17 @@ const Drivers = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '4px',
+                                gap: '6px',
                                 background: doc.url ? 'rgba(34, 197, 94, 0.1)' : 'var(--input-bg)',
                                 color: doc.url ? '#22c55e' : 'var(--text-main)',
                                 border: doc.url ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid var(--glass-border)',
-                                padding: '6px 8px',
-                                borderRadius: '6px',
-                                fontSize: '10px',
+                                padding: '6px 10px',
+                                borderRadius: '8px',
+                                fontSize: '11px',
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
-                                height: '30px'
+                                height: '32px'
                               }}
                             >
                               {doc.uploading ? (
@@ -1243,7 +1271,7 @@ const Drivers = () => {
                                 </>
                               ) : (
                                 <>
-                                  <UploadCloud size={12} /> Upload
+                                  <UploadCloud size={12} /> Upload File
                                 </>
                               )}
                             </label>
@@ -1253,7 +1281,7 @@ const Drivers = () => {
                             <input
                               type="date"
                               className="input-field"
-                              style={{ fontSize: '10px', height: '30px', padding: '0 6px' }}
+                              style={{ fontSize: '11px', height: '32px', padding: '0 8px' }}
                               value={doc.validityDate}
                               onChange={(e) => updateDocumentField(idx, 'validityDate', e.target.value)}
                               required
@@ -1268,9 +1296,9 @@ const Drivers = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: 'var(--input-bg)', color: 'var(--text-main)', cursor: 'pointer', fontSize: '13px' }}>Cancel</button>
-                <button type="submit" className="btn-primary" style={{ flex: 2, height: '38px', fontSize: '13px' }} disabled={submitting}>
-                  {submitting ? <Loader2 className="animate-spin" size={14} /> : 'Register Driver'}
+                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '10px', borderRadius: '12px', border: 'none', background: 'var(--input-bg)', color: 'var(--text-main)', cursor: 'pointer', fontSize: '13px' }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ flex: 2, height: '40px', fontSize: '13px' }} disabled={submitting}>
+                  {submitting ? <Loader2 className="animate-spin" size={16} /> : 'Register Driver'}
                 </button>
               </div>
             </form>

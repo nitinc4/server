@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { uploadApi } from '../utils/api';
-import { Package, ArrowLeft, Loader2, Image as ImageIcon, FileText, CheckCircle, Plus, Trash2  } from 'lucide-react';
+import { Package, ArrowLeft, Loader2, Image as ImageIcon, FileText, CheckCircle, Plus, Trash2 } from 'lucide-react';
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const AddProduct = () => {
   const [priceTiers, setPriceTiers] = useState([]);
   const [b2bVariants, setB2bVariants] = useState([]);
   const [b2cVariants, setB2cVariants] = useState([]);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
@@ -122,7 +122,7 @@ const AddProduct = () => {
       await uploadApi.post('/products', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
+
       navigate('/products');
     } catch (err) {
       console.error(err);
@@ -138,8 +138,8 @@ const AddProduct = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <button 
-          onClick={() => navigate('/products')} 
+        <button
+          onClick={() => navigate('/products')}
           style={{ background: 'var(--input-bg)', border: 'none', color: 'var(--text-main)', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
         >
           <ArrowLeft size={20} />
@@ -157,7 +157,7 @@ const AddProduct = () => {
       )}
 
       <form onSubmit={handleSubmit} className="glass-card" style={{ padding: '32px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        
+
         {/* Basic Details */}
         <div>
           <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -241,7 +241,7 @@ const AddProduct = () => {
               </select>
             </div>
           </div>
-          
+
           <div style={{ marginTop: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>B2B Tiered Pricing</h4>
@@ -269,7 +269,7 @@ const AddProduct = () => {
               </div>
             )}
           </div>
-          
+
           {/* B2C Size Variants Section */}
           <div style={{ marginTop: '24px', borderTop: '1px solid var(--glass-border)', paddingTop: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -284,14 +284,14 @@ const AddProduct = () => {
             {b2cVariants.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {b2cVariants.map((variant, index) => (
-                  <div key={index} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={index} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div style={{ flex: 1.5 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>Size Value *</label>
-                      <input type="number" className="input-field" value={variant.packetSizeVal} onChange={(e) => handleB2cChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500 or 1" required min="0" step="0.01" />
+                      <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.packetSizeVal} onChange={(e) => handleB2cChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500" required min="0" step="0.01" />
                     </div>
                     <div style={{ flex: 1 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>Unit *</label>
-                      <select className="input-field" value={variant.packetSizeUnit} onChange={(e) => handleB2cChange(index, 'packetSizeUnit', e.target.value)} required>
+                      <select className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px', cursor: 'pointer' }} value={variant.packetSizeUnit} onChange={(e) => handleB2cChange(index, 'packetSizeUnit', e.target.value)} required>
                         <option value="g">g</option>
                         <option value="kg">kg</option>
                         <option value="ltr">ltr</option>
@@ -300,14 +300,14 @@ const AddProduct = () => {
                     </div>
                     <div style={{ flex: 1.5 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>B2C Price (₹) *</label>
-                      <input type="number" className="input-field" value={variant.price} onChange={(e) => handleB2cChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
+                      <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.price} onChange={(e) => handleB2cChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
                     </div>
                     <div style={{ flex: 1.2 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>Stock *</label>
-                      <input type="number" className="input-field" value={variant.stock} onChange={(e) => handleB2cChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
+                      <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.stock} onChange={(e) => handleB2cChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
                     </div>
-                    <button type="button" onClick={() => handleRemoveB2c(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', height: '40px', display: 'flex', alignItems: 'center' }}>
-                      <Trash2 size={16} />
+                    <button type="button" onClick={() => handleRemoveB2c(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer', height: '36px', display: 'flex', alignItems: 'center' }}>
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 ))}
@@ -329,14 +329,14 @@ const AddProduct = () => {
             {b2bVariants.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {b2bVariants.map((variant, index) => (
-                  <div key={index} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={index} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', background: 'var(--card-bg)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div style={{ flex: 1.5 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>Size Value *</label>
-                      <input type="number" className="input-field" value={variant.packetSizeVal} onChange={(e) => handleB2bChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500 or 1" required min="0" step="0.01" />
+                      <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.packetSizeVal} onChange={(e) => handleB2bChange(index, 'packetSizeVal', e.target.value)} placeholder="e.g. 500" required min="0" step="0.01" />
                     </div>
                     <div style={{ flex: 1 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>Unit *</label>
-                      <select className="input-field" value={variant.packetSizeUnit} onChange={(e) => handleB2bChange(index, 'packetSizeUnit', e.target.value)} required>
+                      <select className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px', cursor: 'pointer' }} value={variant.packetSizeUnit} onChange={(e) => handleB2bChange(index, 'packetSizeUnit', e.target.value)} required>
                         <option value="g">g</option>
                         <option value="kg">kg</option>
                         <option value="ltr">ltr</option>
@@ -345,14 +345,14 @@ const AddProduct = () => {
                     </div>
                     <div style={{ flex: 1.5 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>B2B Price (₹) *</label>
-                      <input type="number" className="input-field" value={variant.price} onChange={(e) => handleB2bChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
+                      <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.price} onChange={(e) => handleB2bChange(index, 'price', e.target.value)} placeholder="Price" min="0" step="0.01" required />
                     </div>
                     <div style={{ flex: 1.2 }}>
                       <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px' }}>Stock *</label>
-                      <input type="number" className="input-field" value={variant.stock} onChange={(e) => handleB2bChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
+                      <input type="number" className="input-field" style={{ height: '36px', padding: '0 8px', fontSize: '13px' }} value={variant.stock} onChange={(e) => handleB2bChange(index, 'stock', e.target.value)} placeholder="Stock" min="0" required />
                     </div>
-                    <button type="button" onClick={() => handleRemoveB2b(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', height: '40px', display: 'flex', alignItems: 'center' }}>
-                      <Trash2 size={16} />
+                    <button type="button" onClick={() => handleRemoveB2b(index)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer', height: '36px', display: 'flex', alignItems: 'center' }}>
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 ))}

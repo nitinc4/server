@@ -169,10 +169,10 @@ const Deliveries = () => {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '32px', alignItems: 'start' }}>
+      <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '32px', alignItems: 'start' }}>
         {/* Slot Management Section */}
         <div className="glass-card" style={{ padding: '32px', borderRadius: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <div className="flex-responsive" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px', marginBottom: '32px' }}>
             <div>
               <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Clock4 size={24} style={{ color: '#6366f1' }} />
@@ -181,7 +181,7 @@ const Deliveries = () => {
               <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginTop: '4px' }}>Configure your branch's operational delivery slots</p>
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(99,102,241,0.05)', padding: '10px 16px', borderRadius: '16px', border: '1px solid rgba(99,102,241,0.1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(99,102,241,0.05)', padding: '10px 16px', borderRadius: '16px', border: '1px solid rgba(99,102,241,0.1)', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '13px', fontWeight: 700, color: '#6366f1' }}>Same Day Cutoff:</span>
               <input 
                 type="text"
@@ -198,7 +198,7 @@ const Deliveries = () => {
                 {actionLoading === 'cutoff' ? 'Saving...' : 'Save'}
               </button>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button 
                 onClick={exportToExcel}
                 style={{ 

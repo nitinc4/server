@@ -109,7 +109,7 @@ const BulkUpload = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <div className="glass-card" style={{ padding: '32px', borderRadius: '24px' }}>
         <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '24px' }}>Download Templates</h3>
-        <div style={{ display: 'flex', gap: '20px' }}>
+        <div className="flex-responsive" style={{ display: 'flex', gap: '20px' }}>
           <div onClick={() => downloadTemplate('products')} className="glass" style={{ 
             flex: 1, padding: '24px', borderRadius: '20px', cursor: 'pointer', transition: '0.3s',
             display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid rgba(255,255,255,0.05)'

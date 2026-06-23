@@ -10,7 +10,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
 
@@ -41,7 +41,7 @@ const Products = () => {
   const getLowestStock = (product) => {
     let minStock = Infinity;
     let hasVariants = false;
-    
+
     const checkArr = (arr) => {
       if (arr && arr.length > 0) {
         hasVariants = true;
@@ -79,25 +79,30 @@ const Products = () => {
     XLSX.writeFile(wb, "Zudo_Products_Catalog.xlsx");
   };
 
+  const getVariantSizes = (variants) => {
+    if (!variants || variants.length === 0) return 'N/A';
+    return variants.map(v => v.packetSize).join(', ');
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', width: '300px' }}>
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-dim)' }} />
-            <input 
-              type="text" 
-              placeholder="Search products by name..." 
-              className="input-field" 
-              style={{ paddingLeft: '40px' }} 
+            <input
+              type="text"
+              placeholder="Search products by name..."
+              className="input-field"
+              style={{ paddingLeft: '40px' }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div style={{ position: 'relative', width: '200px' }}>
             <Filter size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-dim)' }} />
-            <select 
-              className="input-field" 
+            <select
+              className="input-field"
               style={{ paddingLeft: '40px', appearance: 'none' }}
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -110,22 +115,22 @@ const Products = () => {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button 
-            onClick={exportProducts} 
-            className="btn-primary" 
-            style={{ 
-              background: 'var(--glass-bg)', 
-              color: 'var(--text-main)', 
-              border: '1px solid var(--glass-border)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px' 
+          <button
+            onClick={exportProducts}
+            className="btn-primary"
+            style={{
+              background: 'var(--glass-bg)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--glass-border)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
             <Download size={18} /> Export
           </button>
-          <button 
-            className="btn-primary" 
+          <button
+            className="btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
             onClick={() => navigate('/add-product')}
           >
@@ -140,8 +145,8 @@ const Products = () => {
             <tr style={{ borderBottom: '1px solid var(--glass-border)', background: 'var(--card-bg)' }}>
               <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>Product</th>
               <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>Category</th>
-              <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>B2C Price</th>
-              <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>B2B Price</th>
+              <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>B2C Size Value</th>
+              <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>B2B Size Value</th>
               <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>GST %</th>
               <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>Stock</th>
               <th style={{ padding: '16px 24px', color: 'var(--text-dim)', fontWeight: 600 }}>Action</th>
@@ -149,9 +154,9 @@ const Products = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" style={{ padding: '48px', textAlign: 'center' }}><Loader2 className="animate-spin" style={{ margin: '0 auto' }} /></td></tr>
+              <tr><td colSpan="7" style={{ padding: '48px', textAlign: 'center' }}><Loader2 className="animate-spin" style={{ margin: '0 auto' }} /></td></tr>
             ) : filteredProducts.length === 0 ? (
-              <tr><td colSpan="6" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-dim)' }}>No products found matching your search or filter.</td></tr>
+              <tr><td colSpan="7" style={{ padding: '48px', textAlign: 'center', color: 'var(--text-dim)' }}>No products found matching your search or filter.</td></tr>
             ) : filteredProducts.map(product => (
               <tr key={product._id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                 <td style={{ padding: '16px 24px' }}>
@@ -166,25 +171,25 @@ const Products = () => {
                     <span style={{ fontSize: '11px', color: 'var(--text-dim)' }}>{product.subCategoryId?.name || 'No Subcategory'}</span>
                   </div>
                 </td>
-                <td style={{ padding: '16px 24px' }}>₹{product.price}</td>
-                <td style={{ padding: '16px 24px' }}>₹{product.b2bPrice}</td>
+                <td style={{ padding: '16px 24px' }}>{getVariantSizes(product.b2c)}</td>
+                <td style={{ padding: '16px 24px' }}>{getVariantSizes(product.b2b)}</td>
                 <td style={{ padding: '16px 24px' }}>{product.gstPercent || 0}%</td>
                 <td style={{ padding: '16px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ 
-                      padding: '4px 10px', 
-                      borderRadius: '8px', 
-                      fontSize: '12px', 
+                    <span style={{
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       background: getLowestStock(product) <= 10 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)',
                       color: getLowestStock(product) <= 10 ? '#ef4444' : '#22c55e'
                     }}>
-                      {getLowestStock(product)} 
+                      {getLowestStock(product)}
                     </span>
                   </div>
                 </td>
                 <td style={{ padding: '16px 24px' }}>
-                  <button 
+                  <button
                     onClick={() => navigate(`/edit-product/${product._id}`)}
                     style={{
                       background: 'rgba(99, 102, 241, 0.1)',

@@ -583,63 +583,64 @@ const Cash = () => {
       {showForm && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
-          backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center',
-          justifyContent: 'center', zIndex: 1000, padding: '24px'
+          backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', zIndex: 1000, padding: '16px'
         }}>
           <div className="glass-card" style={{
-            width: '100%', maxWidth: '520px', borderRadius: '32px',
+            width: '100%', maxWidth: '520px', borderRadius: '24px',
             overflow: 'hidden', border: '1px solid var(--glass-border)',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+            maxHeight: '90vh', overflowY: 'auto'
           }}>
             <div style={{
-              padding: '32px', borderBottom: '1px solid var(--glass-border)',
+              padding: '20px 24px', borderBottom: '1px solid var(--glass-border)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               background: 'var(--card-bg)'
             }}>
               <div>
-                <h3 style={{ fontSize: '22px', fontWeight: 800, margin: 0 }}>Log Cash Transaction</h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginTop: '4px' }}>Manually record a cash payment</p>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>Log Cash Transaction</h3>
+                <p style={{ fontSize: '12px', color: 'var(--text-dim)', marginTop: '2px' }}>Manually record a cash payment</p>
               </div>
               <button
                 onClick={() => setShowForm(false)}
-                style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--input-bg)', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--input-bg)', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              <div style={{ display: 'flex', background: 'var(--glass-bg)', padding: '6px', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+            <form onSubmit={handleSubmit} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', background: 'var(--glass-bg)', padding: '4px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
                 {['B2C', 'B2B'].map(type => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setFormData({ ...formData, type })}
                     style={{
-                      flex: 1, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-                      transition: '0.4s cubic-bezier(0.4, 0, 0.2, 1)', fontSize: '14px', fontWeight: 700,
+                      flex: 1, padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                      transition: '0.4s cubic-bezier(0.4, 0, 0.2, 1)', fontSize: '13px', fontWeight: 700,
                       background: formData.type === type ? 'var(--primary)' : 'transparent',
                       color: formData.type === type ? 'white' : 'var(--text-dim)',
                       boxShadow: formData.type === type ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none'
                     }}
                   >
-                    {type === 'B2B' ? <Building2 size={16} style={{ marginRight: '8px', display: 'inline' }} /> : <User size={16} style={{ marginRight: '8px', display: 'inline' }} />}
+                    {type === 'B2B' ? <Building2 size={14} style={{ marginRight: '6px', display: 'inline' }} /> : <User size={14} style={{ marginRight: '6px', display: 'inline' }} />}
                     {type} Customer
                   </button>
                 ))}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {formData.type === 'B2B' ? (
                   <>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Seller Credentials</label>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Seller Credentials</label>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                         <div style={{ position: 'relative' }}>
-                          <User size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                          <User size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                           <input
                             className="input-field"
-                            style={{ paddingLeft: '44px', height: '52px' }}
+                            style={{ paddingLeft: '36px', height: '38px', fontSize: '13px' }}
                             placeholder="Full Name"
                             required
                             value={formData.name}
@@ -647,10 +648,10 @@ const Cash = () => {
                           />
                         </div>
                         <div style={{ position: 'relative' }}>
-                          <Phone size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                          <Phone size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                           <input
                             className="input-field"
-                            style={{ paddingLeft: '44px', height: '52px' }}
+                            style={{ paddingLeft: '36px', height: '38px', fontSize: '13px' }}
                             placeholder="Phone Number"
                             required
                             value={formData.phone}
@@ -660,12 +661,12 @@ const Cash = () => {
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div style={{ position: 'relative' }}>
-                        <Mail size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                        <Mail size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                         <input
                           className="input-field"
-                          style={{ paddingLeft: '44px', height: '52px' }}
+                          style={{ paddingLeft: '36px', height: '38px', fontSize: '13px' }}
                           placeholder="Email Address"
                           required
                           value={formData.email}
@@ -673,11 +674,11 @@ const Cash = () => {
                         />
                       </div>
                       <div style={{ position: 'relative' }}>
-                        <div style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1', fontWeight: 800 }}>***</div>
+                        <div style={{ position: 'absolute', left: '12px', top: '10px', color: '#6366f1', fontWeight: 800, fontSize: '12px' }}>***</div>
                         <input
                           type="password"
                           className="input-field"
-                          style={{ paddingLeft: '44px', height: '52px' }}
+                          style={{ paddingLeft: '36px', height: '38px', fontSize: '13px' }}
                           placeholder="Password"
                           required
                           value={formData.password}
@@ -688,13 +689,13 @@ const Cash = () => {
                   </>
                 ) : (
                   <>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px' }}>Logistics Verification</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Logistics Verification</label>
                       <div style={{ position: 'relative' }}>
-                        <ShieldCheck size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                        <ShieldCheck size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                         <input
                           className="input-field"
-                          style={{ paddingLeft: '44px', height: '52px' }}
+                          style={{ paddingLeft: '36px', height: '38px', fontSize: '13px' }}
                           placeholder="Enter Driver OTP"
                           required
                           value={formData.otp}
@@ -705,13 +706,13 @@ const Cash = () => {
                   </>
                 )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div style={{ position: 'relative' }}>
-                    <DollarSign size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                    <DollarSign size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                     <input
                       type="number"
                       className="input-field"
-                      style={{ paddingLeft: '44px', height: '52px' }}
+                      style={{ paddingLeft: '36px', height: '38px', fontSize: '13px' }}
                       placeholder="Amount (₹)"
                       required
                       value={formData.amount}
@@ -719,10 +720,10 @@ const Cash = () => {
                     />
                   </div>
                   <div style={{ position: 'relative' }}>
-                    <CreditCard size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                    <CreditCard size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                     <select
                       className="input-field"
-                      style={{ paddingLeft: '44px', height: '52px', appearance: 'none' }}
+                      style={{ paddingLeft: '36px', height: '38px', fontSize: '13px', appearance: 'none' }}
                       value={formData.paymentMethod}
                       onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })}
                     >
@@ -734,10 +735,10 @@ const Cash = () => {
                 </div>
 
                 <div style={{ position: 'relative' }}>
-                  <FileText size={16} style={{ position: 'absolute', left: '16px', top: '18px', color: '#6366f1' }} />
+                  <FileText size={14} style={{ position: 'absolute', left: '12px', top: '12px', color: '#6366f1' }} />
                   <textarea
                     className="input-field"
-                    style={{ paddingLeft: '44px', paddingTop: '16px', height: '100px', resize: 'none' }}
+                    style={{ paddingLeft: '36px', paddingTop: '10px', height: '60px', resize: 'none', fontSize: '13px' }}
                     placeholder="Transaction Notes / Description"
                     value={formData.description}
                     onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -749,23 +750,23 @@ const Cash = () => {
                 type="submit"
                 disabled={loading}
                 style={{
-                  marginTop: '12px',
-                  height: '56px',
-                  borderRadius: '16px',
+                  marginTop: '4px',
+                  height: '42px',
+                  borderRadius: '12px',
                   border: 'none',
                   background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
                   color: 'var(--text-main)',
                   fontWeight: 800,
-                  fontSize: '16px',
+                  fontSize: '14px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '12px',
-                  boxShadow: '0 15px 30px -10px rgba(99, 102, 241, 0.4)'
+                  gap: '8px',
+                  boxShadow: '0 8px 16px -6px rgba(99, 102, 241, 0.4)'
                 }}
               >
-                {loading ? <Loader2 className="animate-spin" size={24} /> : <><CheckCircle2 size={20} /> Record Transaction</>}
+                {loading ? <Loader2 className="animate-spin" size={18} /> : <><CheckCircle2 size={16} /> Record Transaction</>}
               </button>
             </form>
           </div>

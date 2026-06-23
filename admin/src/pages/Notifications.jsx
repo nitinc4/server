@@ -176,14 +176,14 @@ const Notifications = () => {
       {/* Header Stats & Active Branch Info */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <p style={{ fontSize: '14px', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', wordBreak: 'break-all' }}>
             <MapPin size={16} color="var(--primary)" />
             Active Location Context: <strong style={{ color: 'var(--text-main)' }}>{getActiveLocation() ? `ID: ${getActiveLocation()}` : 'Global (Multi-Tenant Hub)'}</strong>
           </p>
         </div>
 
         {/* Dynamic Capsule Tab Switcher */}
-        <div style={{ 
+        <div className="tab-switcher" style={{ 
           display: 'flex', 
           background: 'var(--glass-bg)', 
           border: '1px solid var(--glass-border)', 
@@ -195,6 +195,7 @@ const Notifications = () => {
         }}>
           <button 
             onClick={() => setActiveTab('history')}
+            className="tab-button"
             style={{ 
               padding: '10px 20px', 
               borderRadius: '12px', 
@@ -215,6 +216,7 @@ const Notifications = () => {
           </button>
           <button 
             onClick={() => setActiveTab('send')}
+            className="tab-button"
             style={{ 
               padding: '10px 20px', 
               borderRadius: '12px', 
@@ -255,11 +257,11 @@ const Notifications = () => {
 
       {/* Tabs Content */}
       {activeTab === 'history' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '32px', alignItems: 'start' }}>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '32px', alignItems: 'start' }}>
           
           {/* History Feed Card */}
           <div className="glass-card" style={{ padding: '32px', borderRadius: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <div className="flex-responsive" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
               <div>
                 <h3 style={{ fontSize: '20px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <History size={24} color="var(--primary)" />
@@ -509,7 +511,7 @@ const Notifications = () => {
         </div>
       ) : (
         /* Send Notification Tab Content */
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px', alignItems: 'start' }}>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px', alignItems: 'start' }}>
           
           {/* Main Broadcast Send Form */}
           <div className="glass-card" style={{ padding: '40px', borderRadius: '32px' }}>
@@ -566,7 +568,7 @@ const Notifications = () => {
               {/* Recipient User Group Selection */}
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '12px', display: 'block' }}>RECIPIENT USER GROUP</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '12px' }}>
                   {recipients.map(r => (
                     <button
                       key={r.value}

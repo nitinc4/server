@@ -201,7 +201,7 @@ router.get('/:id/location', protect, async (req, res) => {
     });
 
     if (!activeOrder) {
-      return res.status(403).json({ message: 'Location tracking disabled: driver has no active picked-up orders.' });
+      return res.json({ active: false, message: 'Location tracking disabled: driver has no active picked-up orders.' });
     }
 
     const driver = await DriverModel.findById(req.params.id);

@@ -170,12 +170,12 @@ const Sellers = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div className="flex-responsive" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: '28px', fontWeight: 800, marginBottom: '8px' }}>Sellers Portfolio</h2>
           <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Validate and manage your platform's merchant network</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button 
             onClick={exportSellers} 
             className="btn-primary" 
@@ -205,7 +205,7 @@ const Sellers = () => {
       </div>
 
       {/* Stats Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
         {[
           { label: 'Total Merchants', value: stats.total, icon: Users, color: '#6366f1' },
           { label: 'Pending Approval', value: stats.pending, icon: Clock, color: '#f59e0b' },
@@ -244,7 +244,7 @@ const Sellers = () => {
               <div style={{ width: '8px', height: '24px', background: '#6366f1', borderRadius: '4px' }} />
               <h3 style={{ fontSize: '20px', fontWeight: 800 }}>Merchant Registration</h3>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+            <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Full Name</label>
                 <input type="text" placeholder="John Doe" className="input-field" required value={createData.name} onChange={e => setCreateData({...createData, name: e.target.value})} />
@@ -258,7 +258,7 @@ const Sellers = () => {
                 <input type="password" placeholder="••••••••" className="input-field" required value={createData.password} onChange={e => setCreateData({...createData, password: e.target.value})} />
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+            <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Allowed Credit Days</label>
                 <input type="number" placeholder="e.g. 7" className="input-field" value={createData.creditDays} onChange={e => setCreateData({...createData, creditDays: Number(e.target.value) || 0})} min="0" />
@@ -274,7 +274,7 @@ const Sellers = () => {
       )}
 
       {/* Search & Filter Bar */}
-      <div style={{ display: 'flex', gap: '16px' }}>
+      <div className="flex-responsive" style={{ display: 'flex', gap: '16px' }}>
         <div style={{ flex: 1, position: 'relative' }}>
           <Search size={18} style={{ position: 'absolute', left: '16px', top: '15px', color: 'var(--text-dim)' }} />
           <input 
@@ -539,7 +539,7 @@ const Sellers = () => {
             
             <form onSubmit={handleEditSubmit}>
               <div style={{ padding: '32px 40px', display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '70vh', overflowY: 'auto' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Full Name</label>
                     <input type="text" placeholder="John Doe" className="input-field" required value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} />
@@ -550,7 +550,7 @@ const Sellers = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Phone Number</label>
                     <input type="text" placeholder="+919876543210" className="input-field" value={editData.phone || ''} onChange={e => setEditData({...editData, phone: e.target.value})} />
@@ -561,7 +561,7 @@ const Sellers = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Business Name</label>
                     <input type="text" placeholder="Store or business identity" className="input-field" value={editData.businessName || editData.storeName || ''} onChange={e => setEditData({...editData, businessName: e.target.value, storeName: e.target.value})} />
@@ -588,7 +588,7 @@ const Sellers = () => {
                   />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Allowed Credit Days</label>
                     <input type="number" placeholder="Credit days limit" className="input-field" value={editData.creditDays || 0} onChange={e => setEditData({...editData, creditDays: Number(e.target.value) || 0})} min="0" />

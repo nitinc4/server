@@ -209,24 +209,24 @@ const PopupAds = () => {
       </div>
 
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="glass-card" style={{ width: '100%', maxWidth: '500px', borderRadius: '32px', overflow: 'hidden', border: '1px solid var(--glass-border)' }}>
-            <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 800 }}>{editingAd ? 'Refine Popup Ad' : 'New Popup Ad'}</h3>
-              <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}>
-                <X size={24} />
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '480px', borderRadius: '24px', overflow: 'hidden', border: '1px solid var(--glass-border)', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>{editingAd ? 'Refine Popup Ad' : 'New Popup Ad'}</h3>
+              <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <X size={20} />
               </button>
             </div>
-            <div style={{ padding: '32px' }}>
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ padding: '20px 24px' }}>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Campaign Title</label>
-                  <input type="text" className="input-field" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} required placeholder="E.g. Summer Sale 2024" />
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '6px', textTransform: 'uppercase' }}>Campaign Title</label>
+                  <input type="text" className="input-field" style={{ height: '38px', fontSize: '13px', padding: '0 12px' }} value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} required placeholder="E.g. Summer Sale 2024" />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Show On</label>
-                  <select className="input-field" value={formData.showOn} onChange={e => setFormData({ ...formData, showOn: e.target.value })}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '6px', textTransform: 'uppercase' }}>Show On</label>
+                  <select className="input-field" style={{ height: '38px', fontSize: '13px', padding: '0 12px' }} value={formData.showOn} onChange={e => setFormData({ ...formData, showOn: e.target.value })}>
                     <option value="Home">Home Screen</option>
                     <option value="Categories">Categories</option>
                     <option value="Products">Product Details</option>
@@ -235,23 +235,23 @@ const PopupAds = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Target Link (Optional)</label>
-                  <input type="url" className="input-field" value={formData.link} onChange={e => setFormData({ ...formData, link: e.target.value })} placeholder="https://..." />
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '6px', textTransform: 'uppercase' }}>Target Link (Optional)</label>
+                  <input type="url" className="input-field" style={{ height: '38px', fontSize: '13px', padding: '0 12px' }} value={formData.link} onChange={e => setFormData({ ...formData, link: e.target.value })} placeholder="https://..." />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase' }}>Creative Image</label>
-                  <input type="file" className="input-field" onChange={handleImageChange} accept="image/*" required={!editingAd} />
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '6px', textTransform: 'uppercase' }}>Creative Image</label>
+                  <input type="file" className="input-field" style={{ height: '38px', fontSize: '13px', padding: '6px 12px' }} onChange={handleImageChange} accept="image/*" required={!editingAd} />
                   {editingAd && <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '4px' }}>Leave blank to keep current image</p>}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--card-bg)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} style={{ width: '18px', height: '18px', accentColor: '#6366f1' }} />
-                  <label htmlFor="isActive" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}>Enabled and Active</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--card-bg)', padding: '10px 12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <input type="checkbox" id="isActive" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} style={{ width: '16px', height: '16px', accentColor: '#6366f1' }} />
+                  <label htmlFor="isActive" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' }}>Enabled and Active</label>
                 </div>
 
-                <button type="submit" className="btn-primary" disabled={submitting} style={{ height: '52px', marginTop: '12px' }}>
-                  {submitting ? <Loader2 className="animate-spin" size={20} /> : (editingAd ? 'Update Campaign' : 'Launch Campaign')}
+                <button type="submit" className="btn-primary" disabled={submitting} style={{ height: '42px', marginTop: '6px', fontSize: '14px' }}>
+                  {submitting ? <Loader2 className="animate-spin" size={16} /> : (editingAd ? 'Update Campaign' : 'Launch Campaign')}
                 </button>
               </form>
             </div>
