@@ -214,6 +214,13 @@ router.get('/:id/location', protect, async (req, res) => {
 router.put('/:id', protect, async (req, res) => {
   try {
     if (req.body.type) req.body.type = req.body.type.toLowerCase();
+    
+    if (req.body.password) {
+      const bcrypt = require('bcryptjs');
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
+    }
+    
     const DriverModel = getModelSafe('Driver', req, Driver);
     const driver = await DriverModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!driver) return res.status(404).json({ message: 'Driver not found' });
