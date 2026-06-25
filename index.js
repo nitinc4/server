@@ -67,6 +67,7 @@ app.use('/api/ads', require('./routes/ads'));
 app.use('/api/feeds', require('./routes/feeds'));
 app.use('/api/commissions', require('./routes/commissions'));
 app.use('/api/seller-invoices', require('./routes/sellerInvoices'));
+app.use('/api/settings', require('./routes/settings'));
 
 // Base route
 app.get('/', (req, res) => {
