@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const Setting = require('../models/Setting');
+const { getModel } = require('../utils/model_loader');
 
 // Get a setting by key
 router.get('/:key', async (req, res) => {
   try {
     const { key } = req.params;
-    const setting = await Setting.findOne({ key, tenantId: req.tenantId || 'default' });
+    const SettingModel = getModel('Setting', req);
+    const setting = await SettingModel.findOne({ key });
     if (!setting) {
       return res.status(404).json({ message: 'Setting not found' });
     }
@@ -22,15 +23,16 @@ router.post('/:key', async (req, res) => {
     const { key } = req.params;
     const { value } = req.body;
     
-    let setting = await Setting.findOne({ key, tenantId: req.tenantId || 'default' });
+    const SettingModel = getModel('Setting', req);
+    let setting = await SettingModel.findOne({ key });
     if (setting) {
       setting.value = value;
       await setting.save();
     } else {
-      setting = new Setting({
+      setting = new SettingModel({
         key,
         value,
-        tenantId: req.tenantId || 'default'
+        tenantId: req.locationId || 'default'
       });
       await setting.save();
     }
