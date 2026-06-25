@@ -243,6 +243,20 @@ const Login = () => {
                       background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 100%) !important;
                       transform: translateX(4px);
                     }
+                    .loc-scroll::-webkit-scrollbar {
+                      width: 6px;
+                    }
+                    .loc-scroll::-webkit-scrollbar-track {
+                      background: rgba(0, 0, 0, 0.2);
+                      border-radius: 8px;
+                    }
+                    .loc-scroll::-webkit-scrollbar-thumb {
+                      background: rgba(255, 255, 255, 0.18);
+                      border-radius: 8px;
+                    }
+                    .loc-scroll::-webkit-scrollbar-thumb:hover {
+                      background: rgba(255, 255, 255, 0.3);
+                    }
                   `}</style>
                   
                   {fetchingLocations ? (
@@ -277,7 +291,7 @@ const Login = () => {
                         </div>
                       </div>
                       
-                      <div style={{ maxHeight: '200px', overflowY: 'auto', padding: '4px' }}>
+                      <div className="loc-scroll" style={{ maxHeight: '200px', overflowY: 'auto', padding: '4px' }}>
                         {locations.filter(loc => 
                           loc.city.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           loc.state.toLowerCase().includes(searchQuery.toLowerCase())
