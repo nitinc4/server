@@ -49,8 +49,9 @@ const tenantMiddleware = async (req, res, next) => {
         Feed: connection.models.Feed || connection.model('Feed', require('../models/Feed').schema),
         Attendance: connection.models.Attendance || connection.model('Attendance', require('../models/Attendance').schema),
         Commission: connection.models.Commission || connection.model('Commission', require('../models/Commission').schema),
+        Setting: connection.models.Setting || connection.model('Setting', require('../models/Setting').schema),
       };
-
+ 
       req.db = connection;
       req.models = models;
       req.tenantModels = models;
@@ -84,6 +85,7 @@ const tenantMiddleware = async (req, res, next) => {
       Banner: require('../models/Banner'),
       Feed: require('../models/Feed'),
       Commission: require('../models/Commission'),
+      Setting: require('../models/Setting'),
     };
     req.isTenant = false;
   }
