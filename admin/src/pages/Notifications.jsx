@@ -660,8 +660,8 @@ const Notifications = () => {
                   
                   {/* Time Indicator */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '16px', gap: '2px' }}>
-                    <div style={{ fontSize: '32px', fontWeight: 300, color: 'var(--text-main)', opacity: 0.9 }}>17:26</div>
-                    <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-main)', opacity: 0.6, letterSpacing: '0.5px' }}>FRIDAY, MAY 22</div>
+                    <div style={{ fontSize: '32px', fontWeight: 300, color: '#ffffff', opacity: 0.9 }}>17:26</div>
+                    <div style={{ fontSize: '10px', fontWeight: 600, color: '#ffffff', opacity: 0.6, letterSpacing: '0.5px' }}>FRIDAY, MAY 22</div>
                   </div>
 
                   {/* Rich Banner Notification Container */}
@@ -693,13 +693,13 @@ const Notifications = () => {
                           justifyContent: 'center',
                           fontSize: '8px',
                           fontWeight: 900,
-                          color: 'var(--text-main)'
+                          color: '#ffffff'
                         }}>
                           Z
                         </div>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-main)', opacity: 0.9 }}>ZUDO</span>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#ffffff', opacity: 0.9 }}>ZUDO</span>
                       </div>
-                      <span style={{ fontSize: '8px', color: 'var(--text-main)', opacity: 0.4 }}>now</span>
+                      <span style={{ fontSize: '8px', color: '#ffffff', opacity: 0.4 }}>now</span>
                     </div>
 
                     {/* Content Block */}
@@ -708,7 +708,7 @@ const Notifications = () => {
                         <div style={{ 
                           fontSize: '11px', 
                           fontWeight: 800, 
-                          color: 'var(--text-main)', 
+                          color: '#ffffff', 
                           marginBottom: '2px',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -718,7 +718,7 @@ const Notifications = () => {
                         </div>
                         <div style={{ 
                           fontSize: '9px', 
-                          color: 'var(--text-main)', 
+                          color: '#ffffff', 
                           opacity: 0.7, 
                           lineHeight: '1.3',
                           display: '-webkit-box',

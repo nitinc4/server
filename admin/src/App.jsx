@@ -28,6 +28,7 @@ import Sales from './pages/Sales';
 import Commissions from './pages/Commissions';
 import Reports from './pages/Reports';
 import Invoices from './pages/Invoices';
+import Settings from './pages/Settings';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -74,6 +75,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/sales" element={<Sales />} />
                     <Route path="/commissions" element={<Commissions />} />
+                    <Route path="/settings" element={<Settings />} />
                   </Routes>
                 </DashboardLayout>
               </ProtectedRoute>

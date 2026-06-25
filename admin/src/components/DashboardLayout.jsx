@@ -28,7 +28,8 @@ import {
   FileSpreadsheet,
   Receipt,
   Menu,
-  X
+  X,
+  Settings
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import api from '../utils/api';
@@ -119,6 +120,7 @@ const DashboardLayout = ({ children }) => {
     { to: '/payments', icon: Wallet, label: 'Payments', perm: 'manage_sellers' },
     { to: '/cash', icon: Wallet, label: 'Cash Management', perm: 'manage_cash' },
     { to: '/locations', icon: MapPin, label: 'Locations', perm: 'manage_locations' },
+    { to: '/settings', icon: Settings, label: 'Settings', perm: 'view_dashboard' },
     { to: '/profile', icon: User, label: 'My Profile', perm: 'manage_profile' },
   ].filter(item => !item.perm || hasPerm(item.perm));
 
