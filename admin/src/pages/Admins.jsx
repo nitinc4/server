@@ -72,6 +72,8 @@ const Admins = () => {
   const roles = [
     { value: 'super_admin', label: 'Super Admin' },
     { value: 'normal_admin', label: 'Normal Admin' },
+    { value: 'b2b_admin', label: 'B2B Admin' },
+    { value: 'b2c_admin', label: 'B2C Admin' },
     { value: 'sales', label: 'Sales' },
     { value: 'accounting', label: 'Accounting' },
     { value: 'manager', label: 'Manager' },
