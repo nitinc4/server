@@ -497,6 +497,7 @@ router.post('/', protect, async (req, res) => {
 
     const order = new OrderModel({
       userId: targetUserId,
+      type: targetUserRole === 'b2b' ? 'b2b' : 'b2c',
       items: enrichedItems,
       totalAmount: calculatedTotal, // Use server-calculated total for security
       totalAmountWithoutCommissions: calculatedTotalWithoutCommissions,

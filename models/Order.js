@@ -6,6 +6,10 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  type: {
+    type: String,
+    enum: ['b2b', 'b2c']
+  },
   locationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Location',
