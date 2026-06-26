@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const CashTransaction = require('../models/CashTransaction');
+const CashCollector = require('../models/CashCollector');
 
 // @route   GET api/cash
 // @desc    Get all cash transactions
@@ -9,11 +9,11 @@ router.get('/', async (req, res) => {
   try {
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const transactions = await aggregateGET('CashTransaction', req, {}, [], '', { date: -1 });
+      const transactions = await aggregateGET('CashCollector', req, {}, [], '', { date: -1 });
       return res.json(transactions);
     }
-    const CashTransactionModel = req.models?.CashTransaction || CashTransaction;
-    const transactions = await CashTransactionModel.find().sort({ date: -1 });
+    const CashCollectorModel = req.models?.CashCollector || CashCollector;
+    const transactions = await CashCollectorModel.find().sort({ date: -1 });
     res.json(transactions);
   } catch (err) {
     console.error(err.message);
@@ -22,18 +22,19 @@ router.get('/', async (req, res) => {
 });
 
 // @route   POST api/cash
-// @desc    Record a new cash transaction
+// @desc    Record a new cash transaction / collector
 // @access  Private (Admin)
 router.post('/', async (req, res) => {
-  const { type, name, phone, email, amount, description, paymentMethod } = req.body;
+  const { type, name, phone, email, password, amount, description, paymentMethod } = req.body;
 
   try {
-    const CashTransactionModel = req.models?.CashTransaction || CashTransaction;
-    const newTransaction = new CashTransactionModel({
+    const CashCollectorModel = req.models?.CashCollector || CashCollector;
+    const newTransaction = new CashCollectorModel({
       type,
       name,
       phone,
       email,
+      password,
       amount,
       description,
       paymentMethod
