@@ -765,7 +765,8 @@ router.post('/driver-login', async (req, res) => {
 router.post('/cash-collector-login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const collector = await CashCollector.findOne({ email });
+    const CashCollectorModel = getModel('CashCollector', req);
+    const collector = await CashCollectorModel.findOne({ email });
     if (collector && (await collector.comparePassword(password))) {
       
       collector.tokenVersion = (collector.tokenVersion || 0) + 1;
