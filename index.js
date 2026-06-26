@@ -56,7 +56,7 @@ app.use('/api/locations', require('./routes/locations'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/deposits', require('./routes/deposits'));
 app.use('/api/tenancy', require('./routes/tenancy'));
-app.use('/api/feed', require('./routes/feed'));
+app.use('/api/feed', require('./routes/feeds'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/notifications', require('./routes/notifications'));
 console.log('Registering /api/popup-ads route...');

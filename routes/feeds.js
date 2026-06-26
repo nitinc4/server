@@ -8,7 +8,8 @@ const { getModel } = require('../utils/model_loader');
 // ─── Multer storage ───────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../uploads/feeds');
+    const baseUploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads');
+    const dir = path.join(baseUploadDir, 'feeds');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -81,7 +82,8 @@ router.delete('/:id', async (req, res) => {
 
     // Remove physical file
     if (feed.filename) {
-      const filePath = path.join(__dirname, '../uploads/feeds', feed.filename);
+      const baseUploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads');
+      const filePath = path.join(baseUploadDir, 'feeds', feed.filename);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
