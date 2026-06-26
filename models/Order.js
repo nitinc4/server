@@ -106,7 +106,7 @@ const orderSchema = new mongoose.Schema({
   },
   sellerPickups: [{
     sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Seller' },
-    status: { type: String, enum: ['Pending', 'Packed', 'Out for Delivery', 'Rejected by Seller'], default: 'Pending' },
+    status: { type: String, default: 'Pending' },
     pickupCode: String
   }],
   deliveryOtp: {

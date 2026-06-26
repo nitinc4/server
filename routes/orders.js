@@ -779,6 +779,13 @@ router.put('/:id/cancel', protect, async (req, res) => {
     }
 
     order.orderStatus = 'Cancelled';
+    
+    if (order.sellerPickups && order.sellerPickups.length > 0) {
+      order.sellerPickups.forEach(sp => {
+        sp.status = 'Cancelled';
+      });
+    }
+
     await order.save();
 
     // Restore stock
@@ -860,6 +867,13 @@ console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
 
     if (shouldUpdateGlobalStatus) {
       order.orderStatus = status;
+      
+      // Update status for all seller pickups to match the global order status
+      if (order.sellerPickups && order.sellerPickups.length > 0) {
+        order.sellerPickups.forEach(sp => {
+          sp.status = status;
+        });
+      }
     }
     
     // If status is 'Returned', save reason and image
