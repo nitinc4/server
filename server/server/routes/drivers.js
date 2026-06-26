@@ -20,13 +20,17 @@ const getModelSafe = (modelName, req, fallbackModel) => {
 // @desc    Get all drivers
 router.get('/', protect, async (req, res) => {
   try {
+    const filter = {};
+    if (req.portal === 'B2B') filter.type = 'b2b';
+    if (req.portal === 'B2C') filter.type = 'b2c';
+
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const drivers = await aggregateGET('Driver', req);
+      const drivers = await aggregateGET('Driver', req, filter);
       res.json(drivers);
     } else {
       const DriverModel = getModelSafe('Driver', req, Driver);
-      const drivers = await DriverModel.find();
+      const drivers = await DriverModel.find(filter);
       res.json(drivers);
     }
   } catch (error) {

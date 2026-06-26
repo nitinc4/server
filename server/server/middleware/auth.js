@@ -17,6 +17,7 @@ const Banner = require('../models/Banner');
 const { connectDBByLocation } = require('../utils/db_manager');
 
 const protect = async (req, res, next) => {
+  req.portal = req.headers['x-portal'] || 'Super Admin';
   let token;
   
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {

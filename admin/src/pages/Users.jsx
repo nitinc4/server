@@ -7,9 +7,14 @@ import * as XLSX from 'xlsx';
 
 const Users = () => {
   const user = JSON.parse(localStorage.getItem('zudo_admin_user') || '{}');
+  const portal = localStorage.getItem('zudo_admin_portal') || 'Super Admin';
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(user.targetSegment && user.targetSegment !== 'Both' ? user.targetSegment.toLowerCase() : 'b2c');
+  const [activeTab, setActiveTab] = useState(
+    portal !== 'Super Admin' 
+      ? portal.toLowerCase() 
+      : (user.targetSegment && user.targetSegment !== 'Both' ? user.targetSegment.toLowerCase() : 'b2c')
+  );
   const [searchTerm, setSearchTerm] = useState('');
   
   const [editingUser, setEditingUser] = useState(null);
@@ -131,7 +136,7 @@ const Users = () => {
           <button onClick={exportUsers} className="btn-primary" style={{ background: 'var(--glass-bg)', color: 'var(--text-main)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Download size={18} /> Export
           </button>
-          {(!user.targetSegment || user.targetSegment === 'Both') && (
+          {portal === 'Super Admin' && (!user.targetSegment || user.targetSegment === 'Both') && (
             <div style={{ display: 'flex', background: 'var(--glass-bg)', padding: '4px', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
               <button
                 onClick={() => setActiveTab('b2c')}

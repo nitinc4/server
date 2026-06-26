@@ -324,13 +324,17 @@ router.get('/profile', protect, async (req, res) => {
 // @access  Private/Admin
 router.get('/users', protect, async (req, res) => {
   try {
+    const filter = {};
+    if (req.portal === 'B2B') filter.role = 'b2b';
+    if (req.portal === 'B2C') filter.role = 'b2c';
+
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const users = await aggregateGET('User', req, {}, [], '-password');
+      const users = await aggregateGET('User', req, filter, [], '-password');
       res.json(users);
     } else {
       const UserModel = getModel('User', req);
-      const users = await UserModel.find().select('-password');
+      const users = await UserModel.find(filter).select('-password');
       res.json(users);
     }
   } catch (error) {

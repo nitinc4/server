@@ -549,13 +549,22 @@ router.get('/myorders', protect, async (req, res) => {
 // @access  Private
 router.get('/admin/all', protect, async (req, res) => {
   try {
+    let orderFilter = {};
+    if (req.portal === 'B2B' || req.portal === 'B2C') {
+      const { User: UserModel } = getModels(req);
+      const userFilter = { role: req.portal.toLowerCase() };
+      const users = await UserModel.find(userFilter).select('_id');
+      const userIds = users.map(u => u._id);
+      orderFilter.userId = { $in: userIds };
+    }
+
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const orders = await aggregateGET('Order', req, {}, ['userId', 'driverId', 'cashPersonId', 'items.productId'], '', { createdAt: -1 });
+      const orders = await aggregateGET('Order', req, orderFilter, ['userId', 'driverId', 'cashPersonId', 'items.productId'], '', { createdAt: -1 });
       res.json(orders);
     } else {
       const { Order: OrderModel } = getModels(req);
-      const orders = await OrderModel.find()
+      const orders = await OrderModel.find(orderFilter)
         .populate('userId', 'name email role bankDetails phone')
         .populate('driverId', 'name phone')
         .populate('returnDriverId', 'name phone')

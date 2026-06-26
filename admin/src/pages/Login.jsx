@@ -50,6 +50,7 @@ const Login = () => {
       });
       localStorage.setItem('zudo_admin_token', data.token);
       localStorage.setItem('zudo_admin_user', JSON.stringify(data));
+      localStorage.setItem('zudo_admin_portal', segment);
       if (selectedLocation) {
         localStorage.setItem('zudo_admin_location', selectedLocation._id);
       }
@@ -201,7 +202,7 @@ const Login = () => {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{
-                    width: '28px', height: '28px', borderRadius: '6px', 
+                    width: '28px', height: '28px', borderRadius: '6px',
                     background: selectedLocation ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: '0.3s'
@@ -210,7 +211,7 @@ const Login = () => {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Branch</span>
-                    <span style={{ color: selectedLocation ? '#fff' : '#94a3b8', fontWeight: 600, fontSize: '13px' }}>
+                    <span style={{ color: selectedLocation ? 'var(--text-main)' : 'var(--text-dim)', fontWeight: 600, fontSize: '13px' }}>
                       {selectedLocation ? `${selectedLocation.city}` : 'Select Operational Zone'}
                     </span>
                   </div>
@@ -243,22 +244,8 @@ const Login = () => {
                       background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 100%) !important;
                       transform: translateX(4px);
                     }
-                    .loc-scroll::-webkit-scrollbar {
-                      width: 6px;
-                    }
-                    .loc-scroll::-webkit-scrollbar-track {
-                      background: rgba(0, 0, 0, 0.2);
-                      border-radius: 8px;
-                    }
-                    .loc-scroll::-webkit-scrollbar-thumb {
-                      background: rgba(255, 255, 255, 0.18);
-                      border-radius: 8px;
-                    }
-                    .loc-scroll::-webkit-scrollbar-thumb:hover {
-                      background: rgba(255, 255, 255, 0.3);
-                    }
                   `}</style>
-                  
+
                   {fetchingLocations ? (
                     <div style={{ padding: '24px', textAlign: 'center' }}>
                       <Loader2 className="animate-spin" size={20} style={{ margin: '0 auto', color: 'var(--primary)' }} />
@@ -290,10 +277,10 @@ const Login = () => {
                           />
                         </div>
                       </div>
-                      
-                      <div className="loc-scroll" style={{ maxHeight: '200px', overflowY: 'auto', padding: '4px' }}>
-                        {locations.filter(loc => 
-                          loc.city.toLowerCase().includes(searchQuery.toLowerCase()) || 
+
+                      <div style={{ maxHeight: '200px', overflowY: 'auto', padding: '4px' }}>
+                        {locations.filter(loc =>
+                          loc.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           loc.state.toLowerCase().includes(searchQuery.toLowerCase())
                         ).map(loc => (
                           <button
@@ -341,16 +328,16 @@ const Login = () => {
                             )}
                           </button>
                         ))}
-                        
-                        {locations.filter(loc => 
-                          loc.city.toLowerCase().includes(searchQuery.toLowerCase()) || 
+
+                        {locations.filter(loc =>
+                          loc.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           loc.state.toLowerCase().includes(searchQuery.toLowerCase())
                         ).length === 0 && (
-                          <div style={{ padding: '30px 10px', textAlign: 'center' }}>
-                            <MapPin size={20} style={{ color: 'rgba(255, 255, 255, 0.05)', marginBottom: '6px' }} />
-                            <p style={{ color: 'var(--text-dim)', fontSize: '12px' }}>No branches found in this zone</p>
-                          </div>
-                        )}
+                            <div style={{ padding: '30px 10px', textAlign: 'center' }}>
+                              <MapPin size={20} style={{ color: 'rgba(255, 255, 255, 0.05)', marginBottom: '6px' }} />
+                              <p style={{ color: 'var(--text-dim)', fontSize: '12px' }}>No branches found in this zone</p>
+                            </div>
+                          )}
                       </div>
                     </div>
                   )}

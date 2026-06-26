@@ -112,8 +112,12 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
-select.input-field option {
-  background-color: var(--bg-sidebar);
+select option, select.input-field option {
+  background-color: var(--bg-sidebar) !important;
+  color: var(--text-main) !important;
+}
+
+select {
   color: var(--text-main);
 }
 

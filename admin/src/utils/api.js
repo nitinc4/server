@@ -40,6 +40,12 @@ const setupInterceptors = (instance) => {
     if (location && !config.headers['x-location']) {
       config.headers['x-location'] = location;
     }
+
+    // Check if there is a portal header needed
+    const portal = localStorage.getItem('zudo_admin_portal');
+    if (portal && !config.headers['x-portal']) {
+      config.headers['x-portal'] = portal;
+    }
     return config;
   });
 
@@ -47,13 +53,14 @@ const setupInterceptors = (instance) => {
     (response) => response,
     (error) => {
       if (error.response && error.response.status === 401) {
-        if (error.response.data && error.response.data.code === 'SESSION_INVALIDATED') {
-          alert('Session expired. You have logged in from another device.');
-          localStorage.removeItem('zudo_admin_token');
-          localStorage.removeItem('zudo_admin_user');
-          localStorage.removeItem('zudo_admin_location');
+        localStorage.removeItem('zudo_admin_token');
+        localStorage.removeItem('zudo_admin_user');
+        localStorage.removeItem('zudo_admin_location');
+        localStorage.removeItem('zudo_admin_portal');
+        if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
+        return new Promise(() => {}); // Suppress the rejection to prevent component crashes during redirect
       }
       return Promise.reject(error);
     }

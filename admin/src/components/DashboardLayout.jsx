@@ -88,6 +88,7 @@ const DashboardLayout = ({ children }) => {
     localStorage.removeItem('zudo_admin_token');
     localStorage.removeItem('zudo_admin_user');
     localStorage.removeItem('zudo_admin_location');
+    localStorage.removeItem('zudo_admin_portal');
     navigate('/login');
   };
 
@@ -95,6 +96,8 @@ const DashboardLayout = ({ children }) => {
     if (admin.role === 'super_admin') return true;
     return admin.permissions && admin.permissions.includes(perm);
   };
+
+  const portal = localStorage.getItem('zudo_admin_portal') || 'Super Admin';
 
   const menuItems = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard', perm: 'view_dashboard' },
@@ -111,7 +114,7 @@ const DashboardLayout = ({ children }) => {
     { to: '/admins', icon: Users, label: 'Admin Management', perm: 'manage_admins' },
     { to: '/sales', icon: Users, label: 'Sales Team', perm: 'manage_admins' },
     { to: '/bulk-upload', icon: Upload, label: 'Bulk Upload', perm: 'manage_bulk_upload' },
-    { to: '/b2b-verification', icon: ShieldCheck, label: 'B2B Verification', perm: 'manage_b2b_verification' },
+    { to: '/b2b-verification', icon: ShieldCheck, label: 'B2B Verification', perm: 'manage_b2b_verification', portal: 'B2B' },
     { to: '/users', icon: Users, label: 'Users', perm: 'manage_users' },
     { to: '/orders', icon: ShoppingBag, label: 'Orders', perm: 'manage_orders' },
     { to: '/reviews', icon: MessageSquare, label: 'Reviews', perm: 'manage_reviews' },
@@ -122,7 +125,11 @@ const DashboardLayout = ({ children }) => {
     { to: '/locations', icon: MapPin, label: 'Locations', perm: 'manage_locations' },
     { to: '/settings', icon: Settings, label: 'Settings', perm: 'view_dashboard' },
     { to: '/profile', icon: User, label: 'My Profile', perm: 'manage_profile' },
-  ].filter(item => !item.perm || hasPerm(item.perm));
+  ].filter(item => {
+    if (item.perm && !hasPerm(item.perm)) return false;
+    if (portal !== 'Super Admin' && item.portal && item.portal !== portal) return false;
+    return true;
+  });
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'row', position: 'relative' }}>
