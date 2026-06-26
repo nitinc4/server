@@ -20,13 +20,17 @@ const getModelSafe = (modelName, req, fallbackModel) => {
 // @desc    Get all drivers
 router.get('/', protect, async (req, res) => {
   try {
+    const filter = {};
+    if (req.portal === 'B2B') filter.type = 'b2b';
+    if (req.portal === 'B2C') filter.type = 'b2c';
+
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const drivers = await aggregateGET('Driver', req);
+      const drivers = await aggregateGET('Driver', req, filter);
       res.json(drivers);
     } else {
       const DriverModel = getModelSafe('Driver', req, Driver);
-      const drivers = await DriverModel.find();
+      const drivers = await DriverModel.find(filter);
       res.json(drivers);
     }
   } catch (error) {
@@ -199,7 +203,8 @@ router.get('/:id/location', protect, async (req, res) => {
       driverId: req.params.id,
       orderStatus: { $in: ['Picked Up', 'Out for Delivery'] }
     });
-    if (!activeOrder && !req.admin && req.user.role !== 'admin') {
+
+    if (!activeOrder) {
       return res.json({ active: false, message: 'Location tracking disabled: driver has no active picked-up orders.' });
     }
 
@@ -221,13 +226,6 @@ router.get('/:id/location', protect, async (req, res) => {
 router.put('/:id', protect, async (req, res) => {
   try {
     if (req.body.type) req.body.type = req.body.type.toLowerCase();
-    
-    if (req.body.password) {
-      const bcrypt = require('bcryptjs');
-      const salt = await bcrypt.genSalt(10);
-      req.body.password = await bcrypt.hash(req.body.password, salt);
-    }
-    
     const DriverModel = getModelSafe('Driver', req, Driver);
     const driver = await DriverModel.findById(req.params.id);
     if (!driver) return res.status(404).json({ message: 'Driver not found' });

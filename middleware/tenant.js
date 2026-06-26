@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { connectDBByLocation } = require('../utils/db_manager');
 
 const tenantMiddleware = async (req, res, next) => {
+  req.portal = req.headers['x-portal'] || 'Super Admin';
   let tenantId = req.headers['x-tenant-id'] || req.headers['x-location'];
   let dbName = null;
 

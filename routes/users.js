@@ -9,7 +9,10 @@ const { getModel } = require('../utils/model_loader');
 router.get('/', protect, multiTenant, async (req, res) => {
   try {
     const UserModel = getModel('User', req);
-    const users = await UserModel.find().select('-password');
+    const filter = {};
+    if (req.portal === 'B2B') filter.role = 'b2b';
+    if (req.portal === 'B2C') filter.role = 'b2c';
+    const users = await UserModel.find(filter).select('-password');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });

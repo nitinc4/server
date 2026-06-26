@@ -324,13 +324,17 @@ router.get('/profile', protect, async (req, res) => {
 // @access  Private/Admin
 router.get('/users', protect, async (req, res) => {
   try {
+    const filter = {};
+    if (req.portal === 'B2B') filter.role = 'b2b';
+    if (req.portal === 'B2C') filter.role = 'b2c';
+
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const users = await aggregateGET('User', req, {}, [], '-password');
+      const users = await aggregateGET('User', req, filter, [], '-password');
       res.json(users);
     } else {
       const UserModel = getModel('User', req);
-      const users = await UserModel.find().select('-password');
+      const users = await UserModel.find(filter).select('-password');
       res.json(users);
     }
   } catch (error) {
@@ -398,6 +402,23 @@ router.put('/reject-b2b/:id', protect, async (req, res) => {
 router.post('/create-admin', protect, superAdmin, async (req, res) => {
   const { name, email, password, role, locationId, permissions, targetSegment, phone, pincodes } = req.body;
   try {
+    let finalTargetSegment = targetSegment || 'Both';
+    let finalPermissions = permissions || [];
+
+    if (role === 'super_admin') {
+      finalTargetSegment = 'Both';
+      finalPermissions = [
+        'view_dashboard', 'manage_products', 'manage_categories', 'manage_subcategories', 
+        'manage_orders', 'manage_drivers', 'manage_sellers', 'manage_users', 
+        'manage_cash', 'manage_b2b_verification', 'manage_deliveries', 'manage_reviews', 
+        'manage_bulk_upload', 'manage_admins', 'manage_locations', 'manage_profile', 'manage_invoices'
+      ];
+    } else if (role === 'b2b_admin') {
+      finalTargetSegment = 'B2B';
+    } else if (role === 'b2c_admin') {
+      finalTargetSegment = 'B2C';
+    }
+
     let newAdmin;
     if (locationId) {
       const location = await Location.findById(locationId);
@@ -415,10 +436,10 @@ router.post('/create-admin', protect, superAdmin, async (req, res) => {
 
       newAdmin = await TenantAdminModel.create({
         name, email, password, role, locationId,
-        permissions: permissions || [],
+        permissions: finalPermissions,
         phone: phone || '',
         pincodes: pincodes || [],
-        targetSegment: targetSegment || 'Both'
+        targetSegment: finalTargetSegment
       });
     } else {
       // Check Global Admin (in main DB)
@@ -430,8 +451,8 @@ router.post('/create-admin', protect, superAdmin, async (req, res) => {
         locationId: null,
         phone: phone || '',
         pincodes: pincodes || [],
-        permissions: permissions || [],
-        targetSegment: targetSegment || 'Both'
+        permissions: finalPermissions,
+        targetSegment: finalTargetSegment
       });
     }
 

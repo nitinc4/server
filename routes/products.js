@@ -144,10 +144,14 @@ router.get('/', async (req, res) => {
     let productsWithSeller = [];
     const commissions = await loadCommissions(req);
 
+    const filter = {};
+    if (req.portal === 'B2B') filter.b2b = { $exists: true, $not: { $size: 0 } };
+    if (req.portal === 'B2C') filter.b2c = { $exists: true, $not: { $size: 0 } };
+
     if (!req.locationId) {
       // Global Access - Aggregate from all active tenant databases!
       const { aggregateGET } = require('../utils/aggregator');
-      const products = await aggregateGET('Product', req, {}, ['categoryId', 'subCategoryId']);
+      const products = await aggregateGET('Product', req, filter, ['categoryId', 'subCategoryId']);
       
       productsWithSeller = await Promise.all(products.map(async (p) => {
         let enriched = { ...p, sellerName: 'Zudo Official' };
@@ -184,7 +188,7 @@ router.get('/', async (req, res) => {
       }));
     } else {
       const { Product, Seller, User } = getModels(req);
-      const products = await Product.find()
+      const products = await Product.find(filter)
         .populate('categoryId')
         .populate('subCategoryId')
         .lean();
