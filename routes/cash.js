@@ -42,8 +42,8 @@ router.post('/', async (req, res) => {
     const transaction = await newTransaction.save();
     res.json(transaction);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error('Error logging transaction:', err);
+    res.status(500).json({ message: err.message });
   }
 });
 
