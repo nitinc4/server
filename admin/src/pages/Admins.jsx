@@ -453,7 +453,18 @@ const Admins = () => {
                   <input type="text" placeholder="Phone Number" className="input-field pl-12 input-with-icon" value={createData.phone} onChange={e => setCreateData({ ...createData, phone: e.target.value })} />
                 </div>
                 <input type="password" placeholder="Password" className="input-field" required value={createData.password} onChange={e => setCreateData({ ...createData, password: e.target.value })} />
-                <select className="input-field" value={createData.role} onChange={e => setCreateData({ ...createData, role: e.target.value })}>
+                <select 
+                  className="input-field" 
+                  value={createData.role} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setCreateData(prev => ({
+                      ...prev,
+                      role: val,
+                      targetSegment: val === 'super_admin' ? 'Both' : (prev.targetSegment === 'Both' ? 'B2C' : prev.targetSegment)
+                    }));
+                  }}
+                >
                   {roles.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>
                 <select
@@ -469,7 +480,7 @@ const Admins = () => {
                 <div style={{ gridColumn: '1/-1' }}>
                   <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-dim)', marginBottom: '8px', display: 'block' }}>Target Customer Segment</label>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    {['B2B', 'B2C'].map(seg => (
+                    {(createData.role === 'super_admin' ? ['B2B', 'B2C', 'Both'] : ['B2B', 'B2C']).map(seg => (
                       <button
                         key={seg}
                         type="button"
@@ -481,7 +492,7 @@ const Admins = () => {
                           fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: '0.2s'
                         }}
                       >
-                        {`${seg} Only`}
+                        {seg === 'Both' ? 'Both' : `${seg} Only`}
                       </button>
                     ))}
                   </div>
@@ -558,7 +569,18 @@ const Admins = () => {
                   <input type="text" placeholder="Phone Number" className="input-field pl-12 input-with-icon" value={editingAdmin.phone} onChange={e => setEditingAdmin({ ...editingAdmin, phone: e.target.value })} />
                 </div>
                 <input type="password" placeholder="New Password (leave blank to keep current)" className="input-field" value={editingAdmin.password} onChange={e => setEditingAdmin({ ...editingAdmin, password: e.target.value })} />
-                <select className="input-field" value={editingAdmin.role} onChange={e => setEditingAdmin({ ...editingAdmin, role: e.target.value })}>
+                <select 
+                  className="input-field" 
+                  value={editingAdmin.role} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setEditingAdmin(prev => ({
+                      ...prev,
+                      role: val,
+                      targetSegment: val === 'super_admin' ? 'Both' : (prev.targetSegment === 'Both' ? 'B2C' : prev.targetSegment)
+                    }));
+                  }}
+                >
                   {roles.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>
                 <select
@@ -574,7 +596,7 @@ const Admins = () => {
                 <div style={{ gridColumn: '1/-1' }}>
                   <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-dim)', marginBottom: '8px', display: 'block' }}>Target Customer Segment</label>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    {['B2B', 'B2C'].map(seg => (
+                    {(editingAdmin.role === 'super_admin' ? ['B2B', 'B2C', 'Both'] : ['B2B', 'B2C']).map(seg => (
                       <button
                         key={seg}
                         type="button"
@@ -586,7 +608,7 @@ const Admins = () => {
                           fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: '0.2s'
                         }}
                       >
-                        {`${seg} Only`}
+                        {seg === 'Both' ? 'Both' : `${seg} Only`}
                       </button>
                     ))}
                   </div>
