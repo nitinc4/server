@@ -48,6 +48,7 @@ app.use('/api/orders', require('./routes/orders'));
 app.use('/api/subcategories', require('./routes/subcategories'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/deliveries', require('./routes/deliveries'));
+app.use('/api/deliveryslots', require('./routes/deliverySlots'));
 app.use('/api/sellers', require('./routes/sellers'));
 app.use('/api/cash', require('./routes/cash'));
 app.use('/api/cashcollectors', require('./routes/cashCollectors'));
