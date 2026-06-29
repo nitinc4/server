@@ -470,12 +470,20 @@ router.post('/', protect, async (req, res) => {
     // --- Minimum Bill Amount Enforcement ---
     const db = (req.db && req.db.db) ? req.db.db : mongoose.connection.db;
     let minBillAmount = 2000; // Default ₹2,000
+    const minBillKey = targetUserRole === 'b2b' ? 'minimumbillammountB2B' : 'minimumbillammountB2C';
     try {
-      const setting = await db.collection('settings').findOne({ key: 'minimumBillAmount' });
-      if (setting && typeof setting.value === 'number') minBillAmount = setting.value;
+      const setting = await db.collection('settings').findOne({ key: minBillKey });
+      if (setting && typeof setting.value === 'number') {
+        minBillAmount = setting.value;
+      } else {
+        // Fallback to legacy key if new specific keys aren't found yet
+        const legacySetting = await db.collection('settings').findOne({ key: 'minimumBillAmount' });
+        if (legacySetting && typeof legacySetting.value === 'number') minBillAmount = legacySetting.value;
+      }
     } catch (e) { /* use default */ }
 
-    if (calculatedTotal < minBillAmount) {
+    // If minBillAmount is 0, we don't need to enforce it
+    if (minBillAmount > 0 && calculatedTotal < minBillAmount) {
       return res.status(400).json({
         message: `Minimum bill amount is ₹${minBillAmount}. Your current total is ₹${calculatedTotal.toFixed(2)}.`,
         minimumBillAmount: minBillAmount,
