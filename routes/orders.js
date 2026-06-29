@@ -30,11 +30,11 @@ router.param('id', async (req, res, next, id) => {
   console.log(`[router.param('id')] Intercepting ID: ${id}`);
   console.log(`[router.param('id')] req.isTenant: ${req.isTenant}, req.locationId: ${req.locationId}`);
   if (req.isTenant || req.locationId) return next();
-  
+
   try {
     const { getTenantConnections } = require('../utils/db_manager');
     const connections = await getTenantConnections();
-    
+
     for (const [dbName, tenantConn] of Object.entries(connections)) {
       const TenantOrder = tenantConn.models.Order || tenantConn.model('Order', require('../models/Order').schema);
       try {
@@ -87,9 +87,9 @@ const getProductStock = (product, variantSize, role) => {
     }
     return { hasVariant: false, stock: 0 };
   }
-  const hasVariants = (product.b2b && product.b2b.length > 0) || 
-                      (product.b2c && product.b2c.length > 0) || 
-                      (product.variants && product.variants.length > 0);
+  const hasVariants = (product.b2b && product.b2b.length > 0) ||
+    (product.b2c && product.b2c.length > 0) ||
+    (product.variants && product.variants.length > 0);
 
   if (!variantSize && hasVariants) {
     // If no variantSize provided but product has variants, fallback to first variant
@@ -114,9 +114,9 @@ const adjustProductStock = async (ProductModel, productId, variantSize, quantity
 
   let updatedStock = 0;
 
-  const hasVariants = (product.b2b && product.b2b.length > 0) || 
-                      (product.b2c && product.b2c.length > 0) || 
-                      (product.variants && product.variants.length > 0);
+  const hasVariants = (product.b2b && product.b2b.length > 0) ||
+    (product.b2c && product.b2c.length > 0) ||
+    (product.variants && product.variants.length > 0);
 
   let targetVariantSize = variantSize;
   if (!targetVariantSize && hasVariants) {
@@ -148,13 +148,13 @@ const adjustProductStock = async (ProductModel, productId, variantSize, quantity
     };
 
     if (role === 'b2b') {
-      tryUpdateInArray(product.b2b) || 
-      tryUpdateInArray(product.variants) || 
-      tryUpdateInArray(product.b2c);
+      tryUpdateInArray(product.b2b) ||
+        tryUpdateInArray(product.variants) ||
+        tryUpdateInArray(product.b2c);
     } else {
-      tryUpdateInArray(product.b2c) || 
-      tryUpdateInArray(product.variants) || 
-      tryUpdateInArray(product.b2b);
+      tryUpdateInArray(product.b2c) ||
+        tryUpdateInArray(product.variants) ||
+        tryUpdateInArray(product.b2b);
     }
 
     if (updated) {
@@ -178,7 +178,7 @@ const adjustProductStock = async (ProductModel, productId, variantSize, quantity
 const checkAndNotifyLowStock = async (result, item, req) => {
   if (result && result.updatedStock <= 10) {
     const { Notification: NotificationModel, Seller: SellerModel } = getModels(req);
-    
+
     // Create Notification for Admin
     try {
       await NotificationModel.create({
@@ -275,7 +275,7 @@ router.get('/:id/driver-location', protect, async (req, res) => {
 router.post('/', protect, async (req, res) => {
   try {
     const { items, totalAmount, shippingAddress, paymentMethod, deliverySlot } = req.body;
-    
+
     if (!items || items.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     }
@@ -319,8 +319,8 @@ router.post('/', protect, async (req, res) => {
         });
       }
       if (stockInfo.stock < item.quantity) {
-        return res.status(400).json({ 
-          message: `Insufficient stock for product "${productData.name}"${item.variantSize ? ` (${item.variantSize})` : ''}. Available: ${stockInfo.stock}, Requested: ${item.quantity}` 
+        return res.status(400).json({
+          message: `Insufficient stock for product "${productData.name}"${item.variantSize ? ` (${item.variantSize})` : ''}. Available: ${stockInfo.stock}, Requested: ${item.quantity}`
         });
       }
     }
@@ -349,12 +349,12 @@ router.post('/', protect, async (req, res) => {
 
         name = name || enrichedProduct.name;
         image = image || enrichedProduct.imageUrl || enrichedProduct.image;
-        
+
         let basePriceObj = enrichedProduct;
         let rawBasePriceObj = pDataObj;
         const variantArray = targetUserRole === 'b2b' ? (enrichedProduct.b2b || []) : (enrichedProduct.b2c || []);
         const rawVariantArray = targetUserRole === 'b2b' ? (pDataObj.b2b || []) : (pDataObj.b2c || []);
-        
+
         if (item.variantSize && variantArray.length > 0) {
           const variant = variantArray.find(v => (v.packetSize || v.sizeName) === item.variantSize);
           const rawVariant = rawVariantArray.find(v => (v.packetSize || v.sizeName) === item.variantSize);
@@ -381,11 +381,11 @@ router.post('/', protect, async (req, res) => {
 
         // Fallback to first variant if root price is 0 and no variant was specified
         if (!item.variantSize && (!basePriceObj.price || basePriceObj.price === 0)) {
-          const fallbackArray = targetUserRole === 'b2b' ? 
-            (enrichedProduct.b2b?.length ? enrichedProduct.b2b : enrichedProduct.variants) : 
+          const fallbackArray = targetUserRole === 'b2b' ?
+            (enrichedProduct.b2b?.length ? enrichedProduct.b2b : enrichedProduct.variants) :
             (enrichedProduct.b2c?.length ? enrichedProduct.b2c : enrichedProduct.variants);
-          const rawFallbackArray = targetUserRole === 'b2b' ? 
-            (pDataObj.b2b?.length ? pDataObj.b2b : pDataObj.variants) : 
+          const rawFallbackArray = targetUserRole === 'b2b' ?
+            (pDataObj.b2b?.length ? pDataObj.b2b : pDataObj.variants) :
             (pDataObj.b2c?.length ? pDataObj.b2c : pDataObj.variants);
           if (fallbackArray && fallbackArray.length > 0) {
             basePriceObj = fallbackArray[0];
@@ -397,7 +397,7 @@ router.post('/', protect, async (req, res) => {
 
         // Calculate price based on target user role and quantity tiers
         rawPrice = targetUserRole === 'b2b' ? (rawBasePriceObj.b2bPrice || rawBasePriceObj.price) : rawBasePriceObj.price;
-        
+
         if (targetUserRole === 'b2b') {
           let price = basePriceObj.b2bPrice || basePriceObj.price;
           if (basePriceObj.priceTiers && basePriceObj.priceTiers.length > 0) {
@@ -418,7 +418,7 @@ router.post('/', protect, async (req, res) => {
           // For B2B, GST is added on top
           gstAmount = finalPrice * (gstPercent / 100);
           finalPrice = finalPrice + gstAmount;
-          
+
           let rawGstAmount = rawPrice * (gstPercent / 100);
           rawPrice = rawPrice + rawGstAmount;
         } else {
@@ -470,7 +470,7 @@ router.post('/', protect, async (req, res) => {
     // --- Minimum Bill Amount Enforcement ---
     const db = (req.db && req.db.db) ? req.db.db : mongoose.connection.db;
     let minBillAmount = 2000; // Default ₹2,000
-    const minBillKey = targetUserRole === 'b2b' ? 'minimumbillammountB2B' : 'minimumbillammountB2C';
+    const minBillKey = targetUserRole === 'b2b' ? 'minimumBillAmountB2B' : 'minimumBillAmountB2C';
     try {
       const setting = await db.collection('settings').findOne({ key: minBillKey });
       if (setting && typeof setting.value === 'number') {
@@ -496,7 +496,7 @@ router.post('/', protect, async (req, res) => {
     const globalPickupOtp = generateOTP(6);
     const uniqueSellerIds = [...new Set(enrichedItems.filter(i => i.seller?.sellerId).map(i => i.seller.sellerId.toString()))];
     const isMultiSeller = uniqueSellerIds.length > 1;
-    
+
     const sellerPickups = uniqueSellerIds.map(id => ({
       sellerId: id,
       status: 'Pending',
@@ -607,7 +607,7 @@ router.get('/assigned-cash', protect, async (req, res) => {
 router.get('/driver/assigned', protect, async (req, res) => {
   try {
     const { Order: OrderModel } = getModels(req);
-    const orders = await OrderModel.find({ 
+    const orders = await OrderModel.find({
       $or: [
         {
           driverId: req.user._id,
@@ -619,26 +619,26 @@ router.get('/driver/assigned', protect, async (req, res) => {
         }
       ]
     })
-    .populate('driverId', 'name phone')
-    .populate('returnDriverId', 'name phone')
-    .populate('cashPersonId', 'name phone')
-    .sort({ createdAt: -1 });
+      .populate('driverId', 'name phone')
+      .populate('returnDriverId', 'name phone')
+      .populate('cashPersonId', 'name phone')
+      .sort({ createdAt: -1 });
 
     // Map orderStatus for return orders so they don't get hidden by the 'delivered' filter in the app
     const modifiedOrders = orders.map(order => {
       const orderObj = order.toObject();
       if (orderObj.returnDriverId && orderObj.returnDriverId._id.toString() === req.user._id.toString()) {
         if (orderObj.orderStatus === 'Delivered') {
-           orderObj.orderStatus = 'Return Pickup'; 
+          orderObj.orderStatus = 'Return Pickup';
         }
 
         // Flag for the Flutter app
         orderObj.isReturn = true;
 
         // 1. Show only returned items
-        orderObj.items = orderObj.items.filter(i => 
-          i.returnStatus === 'Return Requested' || 
-          i.returnStatus === 'Return Approved' || 
+        orderObj.items = orderObj.items.filter(i =>
+          i.returnStatus === 'Return Requested' ||
+          i.returnStatus === 'Return Approved' ||
           i.returnStatus === 'Picked Up from Customer'
         );
 
@@ -729,7 +729,7 @@ router.put('/:id/ship', protect, async (req, res) => {
     const { Order: OrderModel, Driver: DriverModel } = getModels(req);
     const order = await OrderModel.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    
+
     // Status stays as is (Packed) when admin assigns driver
 
     order.driverId = req.body.driverId;
@@ -759,10 +759,10 @@ router.put('/:id/assign-cash', protect, async (req, res) => {
     const { Order: OrderModel } = getModels(req);
     const order = await OrderModel.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    
+
     order.cashPersonId = req.body.cashPersonId;
     await order.save();
-    
+
     const populatedOrder = await OrderModel.findById(order._id)
       .populate('userId', 'name email role')
       .populate('driverId', 'name phone')
@@ -781,13 +781,13 @@ router.put('/:id/cancel', protect, async (req, res) => {
     const { Order: OrderModel, Product: ProductModel } = getModels(req);
     const order = await OrderModel.findById(req.params.id).populate('userId', 'role');
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    
+
     if (order.orderStatus === 'Cancelled') {
       return res.status(400).json({ message: 'Order is already cancelled' });
     }
 
     order.orderStatus = 'Cancelled';
-    
+
     if (order.sellerPickups && order.sellerPickups.length > 0) {
       order.sellerPickups.forEach(sp => {
         sp.status = 'Cancelled';
@@ -813,15 +813,15 @@ router.all('/:id/status', protect, async (req, res) => {
   try {
     let { status } = req.body;
     const { Order: OrderModel, Product: ProductModel } = getModels(req);
-    
+
     if (!status) {
       return res.status(400).json({ message: 'Status is required' });
     }
-console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
+    console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
     const order = await OrderModel.findById(req.params.id).populate('userId', 'name email role');
     console.log(`[PUT /:id/status] Order found: ${!!order}`);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    
+
     // Authorization check: User can only cancel their own order, or admin, or assigned personnel
     const isCustomer = order.userId?._id?.toString() === req.user._id.toString();
     const isAdmin = !!req.admin || ['super_admin', 'normal_admin', 'manager', 'logistics', 'sales'].includes(req.user.role);
@@ -839,18 +839,18 @@ console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
     }
 
     const previousStatus = order.orderStatus;
-    
+
     // Handle multi-seller pickup status logic
     let shouldUpdateGlobalStatus = true;
-    
+
     if (order.sellerPickups && order.sellerPickups.length > 1) {
       if (isSeller && (status === 'Packed' || status === 'Rejected by Seller')) {
         const sellerPickup = order.sellerPickups.find(sp => sp.sellerId.toString() === req.user._id.toString());
         if (sellerPickup) {
           sellerPickup.status = status;
-          
+
           // Only update global status if ALL sellers have processed (Packed/Rejected/Out for Delivery)
-          const allProcessed = order.sellerPickups.every(sp => 
+          const allProcessed = order.sellerPickups.every(sp =>
             sp.status === 'Packed' || sp.status === 'Rejected by Seller' || sp.status === 'Out for Delivery'
           );
           if (!allProcessed) {
@@ -858,12 +858,12 @@ console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
           }
         }
       }
-      
+
       if (isDriver && status === 'Out for Delivery' && req.body.sellerId) {
         const sellerPickup = order.sellerPickups.find(sp => sp.sellerId.toString() === req.body.sellerId);
         if (sellerPickup) {
           sellerPickup.status = 'Out for Delivery';
-          
+
           // Only update global status if ALL sellers have been picked up
           const allPickedUp = order.sellerPickups.every(sp => sp.status === 'Out for Delivery');
           if (!allPickedUp) {
@@ -875,7 +875,7 @@ console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
 
     if (shouldUpdateGlobalStatus) {
       order.orderStatus = status;
-      
+
       // Update status for all seller pickups to match the global order status
       if (order.sellerPickups && order.sellerPickups.length > 0) {
         order.sellerPickups.forEach(sp => {
@@ -883,7 +883,7 @@ console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
         });
       }
     }
-    
+
     // If status is 'Returned', save reason and image
     if (req.body.status === 'Returned') {
       order.returnReason = req.body.returnReason || null;
@@ -960,7 +960,7 @@ console.log(`[PUT /:id/status] Processing update for ID: ${req.params.id}`);
     if (status === 'Picked Up' || status === 'Out for Delivery') {
       order.deliveryOtp = generateOTP(4);
     }
-    
+
     await order.save();
 
     // If status changed to Cancelled, restore stock
@@ -987,7 +987,7 @@ router.put('/:id/payment', protect, async (req, res) => {
 
     if (paymentScreenshot) order.paymentScreenshot = paymentScreenshot;
     if (paymentStatus) order.paymentStatus = paymentStatus;
-    
+
     // Handle Cash Payment logic
     if (isCash) {
       if (order.cashPersonId) {
@@ -1005,7 +1005,7 @@ router.put('/:id/payment', protect, async (req, res) => {
           await driver.save();
         }
       }
-      order.paymentMethod = 'Cash'; 
+      order.paymentMethod = 'Cash';
       order.paymentStatus = 'Completed';
     }
 
@@ -1032,11 +1032,11 @@ router.post('/:id/delivery-otp', protect, async (req, res) => {
     // Generate new 4-digit OTP
     const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
     order.deliveryOtp = newOtp;
-    
+
     await order.save();
-    res.json({ 
-      message: 'Delivery OTP updated successfully', 
-      deliveryOtp: newOtp 
+    res.json({
+      message: 'Delivery OTP updated successfully',
+      deliveryOtp: newOtp
     });
   } catch (error) {
     console.error('OTP generation error:', error);
@@ -1100,7 +1100,7 @@ router.post('/admin/create', protect, async (req, res) => {
     }
 
     const { userId, items, shippingAddress, paymentMethod } = req.body;
-    
+
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
     }
@@ -1128,8 +1128,8 @@ router.post('/admin/create', protect, async (req, res) => {
         });
       }
       if (stockInfo.stock < item.quantity) {
-        return res.status(400).json({ 
-          message: `Insufficient stock for product "${productData.name}"${item.variantSize ? ` (${item.variantSize})` : ''}. Available: ${stockInfo.stock}, Requested: ${item.quantity}` 
+        return res.status(400).json({
+          message: `Insufficient stock for product "${productData.name}"${item.variantSize ? ` (${item.variantSize})` : ''}. Available: ${stockInfo.stock}, Requested: ${item.quantity}`
         });
       }
     }
@@ -1146,13 +1146,13 @@ router.post('/admin/create', protect, async (req, res) => {
       let basePriceObj = productData;
       let name = item.name || productData.name;
       let gstPercent = productData.gstPercent || 0;
-      
+
       const variantArray = targetUser.role === 'b2b' ? (productData.b2b || []) : (productData.b2c || []);
       if (item.variantSize && variantArray.length > 0) {
         const variant = variantArray.find(v => (v.packetSize || v.sizeName) === item.variantSize);
         if (variant) {
           basePriceObj = variant;
-          
+
           const sizeStr = variant.packetSize || variant.sizeName;
           if (sizeStr && !name.includes(sizeStr)) {
             name = `${name} - ${sizeStr}`;
@@ -1163,7 +1163,7 @@ router.post('/admin/create', protect, async (req, res) => {
         const variant = productData.variants.find(v => v.sizeName === item.variantSize);
         if (variant) {
           basePriceObj = variant;
-          
+
           if (variant.sizeName && !name.includes(variant.sizeName)) {
             name = `${name} - ${variant.sizeName}`;
           }
@@ -1172,8 +1172,8 @@ router.post('/admin/create', protect, async (req, res) => {
 
       // Fallback to first variant if root price is 0 and no variant was specified
       if (!item.variantSize && (!basePriceObj.price || basePriceObj.price === 0)) {
-        const fallbackArray = targetUser.role === 'b2b' ? 
-          (productData.b2b?.length ? productData.b2b : productData.variants) : 
+        const fallbackArray = targetUser.role === 'b2b' ?
+          (productData.b2b?.length ? productData.b2b : productData.variants) :
           (productData.b2c?.length ? productData.b2c : productData.variants);
         if (fallbackArray && fallbackArray.length > 0) {
           basePriceObj = fallbackArray[0];
@@ -1248,7 +1248,7 @@ router.post('/admin/create', protect, async (req, res) => {
     const globalPickupOtp = generateOTP(6);
     const uniqueSellerIds = [...new Set(enrichedItems.filter(i => i.seller?.sellerId).map(i => i.seller.sellerId.toString()))];
     const isMultiSeller = uniqueSellerIds.length > 1;
-    
+
     const sellerPickups = uniqueSellerIds.map(id => ({
       sellerId: id,
       status: 'Pending',
@@ -1276,7 +1276,7 @@ router.post('/admin/create', protect, async (req, res) => {
       const result = await adjustProductStock(ProductModel, item.productId, item.variantSize, -item.quantity, targetUser.role);
       await checkAndNotifyLowStock(result, item, req);
     }
-    
+
     // Populate populated order
     const populated = await OrderModel.findById(createdOrder._id)
       .populate('userId', 'name email role')
@@ -1399,7 +1399,7 @@ router.post('/:id/items/:itemId/return', protect, async (req, res) => {
     const { Order: OrderModel } = getModels(req);
     const order = await OrderModel.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    
+
     if (order.orderStatus !== 'Delivered' && order.orderStatus !== 'Partially Returned') {
       return res.status(400).json({ message: 'Can only return items from delivered orders' });
     }
@@ -1469,7 +1469,7 @@ router.put('/:id/return-reject', protect, async (req, res) => {
         item.returnStatus = 'Return Rejected';
       }
     });
-    
+
     // Check if we need to revert orderStatus
     if (order.orderStatus === 'Return Requested') {
       order.orderStatus = 'Delivered';
@@ -1486,7 +1486,7 @@ router.put('/:id/return-reject', protect, async (req, res) => {
 // @desc    Admin/Seller approves or rejects a return request
 router.put('/:id/items/:itemId/return-status', protect, async (req, res) => {
   try {
-    const { status } = req.body; 
+    const { status } = req.body;
     const { Order: OrderModel } = getModels(req);
     const order = await OrderModel.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
@@ -1504,7 +1504,7 @@ router.put('/:id/items/:itemId/return-status', protect, async (req, res) => {
       const anyStillRequested = order.items.some(i => i.returnStatus === 'Return Requested');
       const anyApproved = order.items.some(i => ['Return Approved', 'Picked Up from Customer', 'Returned to Seller'].includes(i.returnStatus));
       if (!anyStillRequested && !anyApproved) {
-        order.orderStatus = 'Delivered'; 
+        order.orderStatus = 'Delivered';
       }
     }
 
@@ -1541,11 +1541,11 @@ router.put('/:id/assign-return-driver', protect, async (req, res) => {
     }));
 
     await order.save();
-    
+
     const populated = await OrderModel.findById(order._id)
       .populate('userId', 'name email phone')
       .populate('returnDriverId', 'name phone');
-      
+
     res.json(populated);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -1609,7 +1609,7 @@ router.put('/:id/return-delivery', protect, async (req, res) => {
     if (allReturnsComplete) {
       const totalItems = order.items.length;
       const returnedItemsCount = order.items.filter(i => i.returnStatus === 'Returned to Seller').length;
-      
+
       if (returnedItemsCount === totalItems) {
         order.orderStatus = 'Returned';
       } else {
