@@ -12,7 +12,7 @@ const STANDARD_B2C_PRICE = 100;
 const STANDARD_B2B_PRICE = 80;
 const STANDARD_MOQ = 10;
 const STANDARD_UNIT = '1kg';
-const BASE_IMAGE_URL = 'https://zudo.co.in/storage/';
+const BASE_IMAGE_URL = 'https://snbtradingco.in/storage/';
 const IMAGE_SUFFIX = '';
 
 async function migrate() {

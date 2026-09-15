@@ -42,7 +42,7 @@ router.post('/upload', (req, res) => {
     try {
       const FeedModel = getModel('Feed', req);
       const isVideo = req.file.mimetype.startsWith('video/');
-      const productionDomain = 'https://lightgreen-trout-176417.hostingersite.com';
+      const productionDomain = process.env.PRODUCTION_DOMAIN || 'https://snbtradingco.in';
       const url = `${productionDomain}/uploads/feeds/${req.file.filename}`;
 
       const feed = await FeedModel.create({

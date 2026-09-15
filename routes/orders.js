@@ -912,7 +912,7 @@ router.all('/:id/status', protect, async (req, res) => {
                 <p><strong>Reason:</strong> ${order.returnReason}</p>
                 <p><strong>Comment:</strong> ${order.returnComment || 'No comment'}</p>
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                ${order.returnImage ? `<p><strong>Evidence:</strong> <br/><img src="${order.returnImage.startsWith('http') ? order.returnImage : (process.env.BASE_URL || 'https://zudo.co.in') + order.returnImage}" style="max-width: 100%; border-radius: 10px; margin-top: 10px;"/></p>` : ''}
+                ${order.returnImage ? `<p><strong>Evidence:</strong> <br/><img src="${order.returnImage.startsWith('http') ? order.returnImage : (process.env.BASE_URL || 'https://snbtradingco.in') + order.returnImage}" style="max-width: 100%; border-radius: 10px; margin-top: 10px;"/></p>` : ''}
               </div>
               <div style="background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 12px; color: #777;">
                 Sent from Zudo Admin Panel

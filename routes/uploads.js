@@ -48,7 +48,7 @@ router.post('/', (req, res) => {
     }
 
     try {
-      const productionDomain = 'https://lightgreen-trout-176417.hostingersite.com';
+      const productionDomain = process.env.PRODUCTION_DOMAIN || 'https://snbtradingco.in';
       const fileUrl = `${productionDomain}/uploads/${req.file.filename}`;
       res.status(200).json({
         message: 'File uploaded successfully',

@@ -46,7 +46,7 @@ async function migrate() {
         if (!category) {
           category = await Category.create({
             name: catName,
-            imageUrl: p.images && p.images[0] ? p.images[0] : 'https://zudo.co.in/storage/app/public/categories/default.png'
+            imageUrl: p.images && p.images[0] ? p.images[0] : 'https://snbtradingco.in/storage/app/public/categories/default.png'
           });
           console.log(`Created Category: ${catName}`);
         }
@@ -60,7 +60,7 @@ async function migrate() {
           subCategory = await SubCategory.create({
             name: subCatName,
             categoryId,
-            imageUrl: p.images && p.images[0] ? p.images[0] : 'https://zudo.co.in/storage/app/public/subcategories/default.png'
+            imageUrl: p.images && p.images[0] ? p.images[0] : 'https://snbtradingco.in/storage/app/public/subcategories/default.png'
           });
           console.log(`Created SubCategory: ${subCatName} under ${catName}`);
         }
@@ -82,7 +82,7 @@ async function migrate() {
         b2bPrice: p.offerprice || p.price || 0,
         moq: p.moq || 1,
         unit: 'piece', // Default unit
-        imageUrl: p.images && p.images[0] ? p.images[0] : 'https://zudo.co.in/storage/app/public/products/default.png',
+        imageUrl: p.images && p.images[0] ? p.images[0] : 'https://snbtradingco.in/storage/app/public/products/default.png',
         rating: p.rating || 0
       });
       count++;

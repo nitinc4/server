@@ -253,7 +253,7 @@ router.post('/', protect, upload.fields([{ name: 'image', maxCount: 1 }, { name:
       console.error("Failed to parse priceTiers, b2b, or b2c", e);
     }
 
-    const productionDomain = 'https://lightgreen-trout-176417.hostingersite.com';
+    const productionDomain = process.env.PRODUCTION_DOMAIN || 'https://snbtradingco.in';
     let imageUrl = req.body.imageUrl || '';
     if (req.files && req.files['image']) {
       imageUrl = `${productionDomain}/uploads/${req.files['image'][0].filename}`;
@@ -325,7 +325,7 @@ router.post('/bulk-upload', protect, excelUpload.single('file'), async (req, res
       if (!category) {
         category = await CategoryModel.create({
           name: item.Category,
-          imageUrl: item.CategoryImageUrl || 'https://lightgreen-trout-176417.hostingersite.com/uploads/default-category.png'
+          imageUrl: item.CategoryImageUrl || 'https://snbtradingco.in/uploads/default-category.png'
         });
       }
 
@@ -336,7 +336,7 @@ router.post('/bulk-upload', protect, excelUpload.single('file'), async (req, res
         if (!subCategory) {
           subCategory = await SubCategoryModel.create({
             name: item.SubCategory,
-            imageUrl: item.SubCategoryImageUrl || 'https://lightgreen-trout-176417.hostingersite.com/uploads/default-subcategory.png',
+            imageUrl: item.SubCategoryImageUrl || 'https://snbtradingco.in/uploads/default-subcategory.png',
             categoryId: category._id
           });
         }
@@ -424,7 +424,7 @@ router.post('/bulk-upload', protect, excelUpload.single('file'), async (req, res
           gstPercent: item.GST || 0,
           moq: item.MOQ || 1,
           unit: item.Unit || 'pcs',
-          imageUrl: item.ImageUrl || 'https://lightgreen-trout-176417.hostingersite.com/uploads/default-product.png',
+          imageUrl: item.ImageUrl || 'https://snbtradingco.in/uploads/default-product.png',
           description: item.Description || '',
           pdfUrl: item.PdfUrl || null,
           sellerId: determinedSellerId,
