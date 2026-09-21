@@ -13,7 +13,8 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'https://snbtradingco.in',
-    'https://www.snbtradingco.in'
+    'https://www.snbtradingco.in',
+    'https://zudo-sellerpanel-final.vercel.app'
   ],
   credentials: true
 }));
