@@ -223,7 +223,7 @@ router.put('/:id/read', protect, async (req, res) => {
     const notification = await NotificationModel.findByIdAndUpdate(
       req.params.id,
       { isRead: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
     res.json(notification);
   } catch (error) {
@@ -253,7 +253,7 @@ router.post('/register-token', protect, async (req, res) => {
     const user = await UserModel.findByIdAndUpdate(
       req.user._id,
       { fcmToken: req.body.fcmToken },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     console.log(`[FCM] Registered token for user ${user.email}: ${req.body.fcmToken}`);
@@ -305,20 +305,24 @@ router.post('/trigger-exit', async (req, res) => {
 
         // Send real FCM notification if Firebase Admin SDK is configured
         if (firebaseService.isConfigured && firebaseService.admin) {
-          const message = {
-            token: fcmToken,
-            notification: {
-              title: title,
-              body: body,
-            },
-            data: {
-              click_action: 'FLUTTER_NOTIFICATION_CLICK',
-              type: type,
-            },
-          };
-          
-          await firebaseService.admin.messaging().send(message);
-          console.log(`[FCM] Real push notification successfully sent to device using token: ${fcmToken}`);
+          if (fcmToken.includes('mock-')) {
+            console.log(`[FCM] (Mock Mode) Mock token detected. Skipping actual Firebase send for token: ${fcmToken}`);
+          } else {
+            const message = {
+              token: fcmToken,
+              notification: {
+                title: title,
+                body: body,
+              },
+              data: {
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+                type: type,
+              },
+            };
+            
+            await firebaseService.admin.messaging().send(message);
+            console.log(`[FCM] Real push notification successfully sent to device using token: ${fcmToken}`);
+          }
         } else {
           console.log(`[FCM] (Mock Mode) Push notification would have been sent to device. Token: ${fcmToken}`);
         }
