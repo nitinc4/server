@@ -41,7 +41,8 @@ router.put('/category/:categoryId', protect, async (req, res) => {
         categoryId,
         unit: comm.unit,
         commissionType: comm.commissionType,
-        commissionValue: comm.commissionValue
+        commissionValue: comm.commissionValue,
+        pincode: comm.pincode || 'All'
       }));
       await Commission.insertMany(rulesToInsert);
     }

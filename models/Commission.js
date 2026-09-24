@@ -19,10 +19,14 @@ const commissionSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
+  },
+  pincode: {
+    type: String,
+    default: 'All'
   }
 }, { timestamps: true });
 
-// Enforce unique combination of category and unit
-commissionSchema.index({ categoryId: 1, unit: 1 }, { unique: true });
+// Enforce unique combination of category, unit, and pincode
+commissionSchema.index({ categoryId: 1, unit: 1, pincode: 1 }, { unique: true });
 
 module.exports = mongoose.model('Commission', commissionSchema);
