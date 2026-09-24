@@ -293,4 +293,19 @@ router.get('/:id/attendance', protect, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/drivers/:id
+// @desc    Delete a driver
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const DriverModel = getModelSafe('Driver', req, Driver);
+    const driver = await DriverModel.findById(req.params.id);
+    if (!driver) return res.status(404).json({ message: 'Driver not found' });
+    
+    await DriverModel.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Driver deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
