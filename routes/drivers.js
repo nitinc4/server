@@ -41,7 +41,7 @@ router.get('/', protect, async (req, res) => {
 // @route   POST /api/drivers
 // @desc    Create a driver profile
 router.post('/', protect, async (req, res) => {
-  const { name, phone, email, password, licenseNumber, vehicleDetails, type, cashManagement, documents } = req.body;
+  const { name, phone, email, password, licenseNumber, vehicleDetails, type, cashManagement, documents, vehicleNo, drivingLicense, aadharNumber } = req.body;
   try {
     const DriverModel = getModelSafe('Driver', req, Driver);
     
@@ -52,7 +52,7 @@ router.post('/', protect, async (req, res) => {
       hashedPassword = await bcrypt.hash(password, salt);
     }
     
-    const driverData = { name, phone, password: hashedPassword, licenseNumber, vehicleDetails, cashManagement };
+    const driverData = { name, phone, password: hashedPassword, licenseNumber, vehicleDetails, cashManagement, vehicleNo, drivingLicense, aadharNumber };
     if (email && email.trim() !== '') driverData.email = email;
     if (type) driverData.type = type.toLowerCase();
     if (documents) {
