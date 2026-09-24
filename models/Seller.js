@@ -18,6 +18,7 @@ const sellerSchema = new mongoose.Schema({
   storePic: { type: String },
   tradeLicenseDoc: { type: String },
   rmcAmpcDoc: { type: String },
+  foodLicenseDoc: { type: String },
   status: { 
     type: String, 
     enum: ['pending', 'approved', 'rejected'], 
