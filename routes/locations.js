@@ -116,7 +116,7 @@ router.post('/', protect, superAdmin, async (req, res) => {
     // Check if it already exists in central to get/preserve the existing _id
     let centralLoc = await CentralLocation.findOne({ city: data.city });
     if (centralLoc) {
-      centralLoc = await CentralLocation.findByIdAndUpdate(centralLoc._id, data, { new: true });
+      centralLoc = await CentralLocation.findByIdAndUpdate(centralLoc._id, data, { returnDocument: 'after' });
     } else {
       centralLoc = await CentralLocation.create(data);
     }
@@ -127,7 +127,7 @@ router.post('/', protect, superAdmin, async (req, res) => {
     const location = await Location.findOneAndUpdate(
       { city: data.city },
       locationData,
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     // 3. Create/Switch to the new DB and save location there too
@@ -139,7 +139,7 @@ router.post('/', protect, superAdmin, async (req, res) => {
     const locInNewDb = await NewLocation.findOneAndUpdate(
       { city: data.city },
       locationData,
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     // 4. Create Pincode documents in the new DB
@@ -204,11 +204,11 @@ router.put('/:id', protect, superAdmin, async (req, res) => {
     // 1. Update in central database (zudo-central)
     const centralConn = await getCentralConn();
     const CentralLocation = centralConn.models.Location || centralConn.model('Location', Location.schema);
-    const location = await CentralLocation.findByIdAndUpdate(req.params.id, data, { new: true });
+    const location = await CentralLocation.findByIdAndUpdate(req.params.id, data, { returnDocument: 'after' });
     if (!location) return res.status(404).json({ message: 'Location not found' });
 
     // Also update in default DB (for admin tracking)
-    await Location.findByIdAndUpdate(req.params.id, data, { new: true });
+    await Location.findByIdAndUpdate(req.params.id, data, { returnDocument: 'after' });
 
     // Sync changes to specific DB
     const cityClean = location.city.toLowerCase().replace(/\s+/g, '-');
@@ -221,7 +221,7 @@ router.put('/:id', protect, superAdmin, async (req, res) => {
     const locInNewDb = await NewLocation.findOneAndUpdate(
       { city: location.city },
       data,
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     if (data.pincode) {

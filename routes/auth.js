@@ -374,7 +374,7 @@ router.put('/verify-b2b/:id', protect, async (req, res) => {
     const user = await UserModel.findByIdAndUpdate(req.params.id, {
       isVerified: true,
       isWaitingApproval: false
-    }, { new: true });
+    }, { returnDocument: 'after' });
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
@@ -390,7 +390,7 @@ router.put('/reject-b2b/:id', protect, async (req, res) => {
     const user = await UserModel.findByIdAndUpdate(req.params.id, {
       isWaitingApproval: false,
       isVerified: false
-    }, { new: true });
+    }, { returnDocument: 'after' });
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {

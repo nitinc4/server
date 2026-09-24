@@ -495,7 +495,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', protect, async (req, res) => {
   try {
     const { Product } = getModels(req);
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {

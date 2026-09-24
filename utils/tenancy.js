@@ -34,7 +34,7 @@ const syncToCentral = async (city, dbName, pincodes) => {
       await Mapping.findOneAndUpdate(
         { pincode: pc },
         { dbName, city },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: 'after' }
       );
     }
     console.log(`Synced ${pcList.length} pincodes to central mapping for ${city}`);

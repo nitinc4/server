@@ -43,7 +43,7 @@ router.post('/', protect, async (req, res) => {
 router.put('/:id', protect, async (req, res) => {
   try {
     const BannerModel = getModel('Banner', req);
-    const banner = await BannerModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const banner = await BannerModel.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!banner) return res.status(404).json({ message: 'Banner not found' });
     res.json(banner);
   } catch (error) {

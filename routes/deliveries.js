@@ -85,7 +85,7 @@ router.post('/slots', protect, async (req, res) => {
 router.put('/slots/:id', protect, async (req, res) => {
   try {
     const SlotModel = getModel('DeliverySlot', req);
-    const slot = await SlotModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const slot = await SlotModel.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!slot) return res.status(404).json({ message: 'Slot not found' });
     res.json(slot);
   } catch (error) {

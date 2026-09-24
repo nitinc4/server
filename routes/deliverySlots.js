@@ -44,7 +44,7 @@ router.put('/:id', protect, async (req, res) => {
     const updatedSlot = await DeliverySlot.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
     if (!updatedSlot) return res.status(404).json({ message: 'Delivery slot not found' });
     res.json(updatedSlot);

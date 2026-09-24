@@ -42,7 +42,7 @@ router.post('/', protect, async (req, res) => {
 router.put('/:id', protect, async (req, res) => {
   try {
     const PopupAdModel = getModel('PopupAd', req);
-    const ad = await PopupAdModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const ad = await PopupAdModel.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
     if (!ad) return res.status(404).json({ message: 'Ad not found' });
     res.json(ad);
   } catch (error) {

@@ -97,7 +97,7 @@ router.post('/location', protect, async (req, res) => {
           updatedAt: new Date() 
         } 
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
     
     res.json({ message: 'Location updated successfully', currentLocation: driver.currentLocation });
