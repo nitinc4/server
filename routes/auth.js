@@ -373,9 +373,26 @@ router.put('/verify-b2b/:id', protect, async (req, res) => {
     const UserModel = getModel('User', req);
     const user = await UserModel.findByIdAndUpdate(req.params.id, {
       isVerified: true,
-      isWaitingApproval: false
+      isWaitingApproval: false,
+      isBlocked: false
     }, { returnDocument: 'after' });
     if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Send notification to the user
+    try {
+      const NotificationModel = getModel('Notification', req);
+      if (NotificationModel) {
+        await NotificationModel.create({
+          userId: user._id,
+          title: 'Account Verified 🎉',
+          message: 'Your B2B account has been verified by the admin. You can now access all B2B features!',
+          type: 'system'
+        });
+      }
+    } catch (notifErr) {
+      console.error('Failed to send verification notification', notifErr);
+    }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -389,9 +406,59 @@ router.put('/reject-b2b/:id', protect, async (req, res) => {
     const UserModel = getModel('User', req);
     const user = await UserModel.findByIdAndUpdate(req.params.id, {
       isWaitingApproval: false,
-      isVerified: false
+      isVerified: false,
+      isBlocked: false
     }, { returnDocument: 'after' });
     if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Send notification to the user
+    try {
+      const NotificationModel = getModel('Notification', req);
+      if (NotificationModel) {
+        await NotificationModel.create({
+          userId: user._id,
+          title: 'Account Rejected ❌',
+          message: 'Your B2B account application has been rejected. Please contact support for more details.',
+          type: 'system'
+        });
+      }
+    } catch (notifErr) {
+      console.error('Failed to send rejection notification', notifErr);
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @route   PUT /api/auth/block-b2b/:id
+// @desc    Block a B2B user
+router.put('/block-b2b/:id', protect, async (req, res) => {
+  try {
+    const UserModel = getModel('User', req);
+    const user = await UserModel.findByIdAndUpdate(req.params.id, {
+      isVerified: false,
+      isWaitingApproval: false,
+      isBlocked: true
+    }, { returnDocument: 'after' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Send notification to the user
+    try {
+      const NotificationModel = getModel('Notification', req);
+      if (NotificationModel) {
+        await NotificationModel.create({
+          userId: user._id,
+          title: 'Account Blocked 🚫',
+          message: 'Your B2B account has been blocked due to policy violations. Please contact support.',
+          type: 'system'
+        });
+      }
+    } catch (notifErr) {
+      console.error('Failed to send blocking notification', notifErr);
+    }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
