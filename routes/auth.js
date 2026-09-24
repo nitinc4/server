@@ -465,6 +465,19 @@ router.put('/block-b2b/:id', protect, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/auth/users/:id
+// @desc    Delete a user
+router.delete('/users/:id', protect, async (req, res) => {
+  try {
+    const UserModel = getModel('User', req);
+    const user = await UserModel.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Admin Management
 router.post('/create-admin', protect, superAdmin, async (req, res) => {
   const { name, email, password, role, locationId, permissions, targetSegment, phone, pincodes } = req.body;
