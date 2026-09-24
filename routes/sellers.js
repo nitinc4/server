@@ -70,8 +70,8 @@ router.post('/login', async (req, res) => {
     const { Seller: SellerModel } = getModels(req);
     user = await SellerModel.findOne({ email });
 
-    // If not found, and we don't have a specific location, search through all tenant DBs
-    if (!user && !req.locationId) {
+    // If not found, search through all tenant DBs
+    if (!user) {
       const mongoose = require('mongoose');
       const URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/zudodb';
       const lastSlashIndex = URI.lastIndexOf('/');
