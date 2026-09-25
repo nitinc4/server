@@ -60,4 +60,48 @@ router.post('/', async (req, res) => {
   }
 });
 
+// @route   PUT api/cash/:id
+// @desc    Update a cash transaction
+// @access  Private (Admin)
+router.put('/:id', async (req, res) => {
+  const { type, name, phone, email, password, amount, description, paymentMethod } = req.body;
+  try {
+    const CashCollectorModel = req.models?.CashCollector || CashCollector;
+    let transaction = await CashCollectorModel.findById(req.params.id);
+    if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
+
+    if (type) transaction.type = type;
+    if (name) transaction.name = name;
+    if (phone) transaction.phone = phone;
+    if (email !== undefined) transaction.email = email;
+    if (password) transaction.password = password;
+    if (amount !== undefined) transaction.amount = amount;
+    if (description !== undefined) transaction.description = description;
+    if (paymentMethod) transaction.paymentMethod = paymentMethod;
+
+    transaction = await transaction.save();
+    res.json(transaction);
+  } catch (err) {
+    console.error('Error updating transaction:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// @route   DELETE api/cash/:id
+// @desc    Delete a cash transaction
+// @access  Private (Admin)
+router.delete('/:id', async (req, res) => {
+  try {
+    const CashCollectorModel = req.models?.CashCollector || CashCollector;
+    const transaction = await CashCollectorModel.findById(req.params.id);
+    if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
+    
+    await CashCollectorModel.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Transaction removed' });
+  } catch (err) {
+    console.error('Error deleting transaction:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
