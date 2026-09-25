@@ -48,7 +48,7 @@ router.post('/generate', protect, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to generate invoices' });
     }
 
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, invoiceNumber } = req.body;
     let sellerId = req.user?._id;
     
     if (req.admin) {
@@ -58,8 +58,8 @@ router.post('/generate', protect, async (req, res) => {
       sellerId = req.body.sellerId;
     }
 
-    if (!startDate || !endDate) {
-      return res.status(400).json({ message: 'Start date and end date are required' });
+    if (!startDate || !endDate || !invoiceNumber) {
+      return res.status(400).json({ message: 'Start date, end date, and invoice number are required' });
     }
 
     const { Order: OrderModel, SellerInvoice: InvoiceModel, Seller: SellerModel } = getModels(req);
@@ -80,6 +80,11 @@ router.post('/generate', protect, async (req, res) => {
       return res.status(400).json({ 
         message: 'You already have an invoice generated that overlaps with this date range. Status: ' + overlappingInvoice.status 
       });
+    }
+
+    const existingInvoiceNum = await InvoiceModel.findOne({ sellerId, invoiceNumber });
+    if (existingInvoiceNum) {
+      return res.status(400).json({ message: 'This invoice number already exists for this seller' });
     }
 
     const seller = await SellerModel.findById(sellerId);
@@ -129,6 +134,7 @@ router.post('/generate', protect, async (req, res) => {
     // Create Invoice Record
     const newInvoice = new InvoiceModel({
       sellerId: sellerId,
+      invoiceNumber: invoiceNumber,
       startDate: start,
       endDate: end,
       totalAmount: totalAmount,
@@ -164,7 +170,7 @@ router.post('/generate', protect, async (req, res) => {
           `,
           attachments: [
             {
-              filename: `Invoice_${seller.businessName.replace(/\s+/g, '_')}_${newInvoice._id}.pdf`,
+              filename: `Invoice_${seller.businessName.replace(/\s+/g, '_')}_${invoiceNumber}.pdf`,
               content: pdfBuffer,
               contentType: 'application/pdf'
             }
@@ -197,7 +203,7 @@ router.post('/generate', protect, async (req, res) => {
     // Meta Details Grid
     doc.rect(40, 180, 515, 65).stroke('#d1d5db');
     doc.font('Helvetica-Bold').fontSize(10);
-    doc.text('Invoice ID:', 55, 195).font('Helvetica').text(newInvoice._id.toString(), 140, 195);
+    doc.text('Invoice No:', 55, 195).font('Helvetica').text(invoiceNumber, 140, 195);
     doc.font('Helvetica-Bold').text('Date Range:', 55, 215).font('Helvetica').text(`${start.toLocaleDateString()} to ${end.toLocaleDateString()}`, 140, 215);
     
     doc.font('Helvetica-Bold').text('Status:', 350, 195).font('Helvetica').text(newInvoice.status, 430, 195);
@@ -327,7 +333,7 @@ router.get('/:id/download', protect, async (req, res) => {
     const orders = await OrderModel.find({ _id: { $in: invoice.orders } });
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=Invoice_${invoice._id}.pdf`);
+    res.setHeader('Content-Disposition', `attachment; filename=Invoice_${invoice.invoiceNumber || invoice._id}.pdf`);
 
     const doc = new PDFDocument({ margin: 40, size: 'A4' });
     doc.pipe(res);
@@ -354,7 +360,7 @@ router.get('/:id/download', protect, async (req, res) => {
     // Meta Details Grid
     doc.rect(40, 180, 515, 65).stroke('#d1d5db');
     doc.font('Helvetica-Bold').fontSize(10);
-    doc.text('Invoice ID:', 55, 195).font('Helvetica').text(invoice._id.toString(), 140, 195);
+    doc.text('Invoice No:', 55, 195).font('Helvetica').text(invoice.invoiceNumber || invoice._id.toString(), 140, 195);
     doc.font('Helvetica-Bold').text('Date Range:', 55, 215).font('Helvetica').text(`${new Date(invoice.startDate).toLocaleDateString()} to ${new Date(invoice.endDate).toLocaleDateString()}`, 140, 215);
     
     doc.font('Helvetica-Bold').text('Status:', 350, 195).font('Helvetica').text(invoice.status, 430, 195);

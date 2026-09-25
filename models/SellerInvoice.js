@@ -6,6 +6,10 @@ const sellerInvoiceSchema = new mongoose.Schema({
     ref: 'Seller',
     required: true
   },
+  invoiceNumber: {
+    type: String,
+    required: false
+  },
   startDate: {
     type: Date,
     required: true
