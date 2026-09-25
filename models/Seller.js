@@ -32,7 +32,9 @@ const sellerSchema = new mongoose.Schema({
   },
   tokenVersion: { type: Number, default: 0 },
   creditDays: { type: Number, default: 0 },
-  currentSessionToken: { type: String, default: null }
+  currentSessionToken: { type: String, default: null },
+  b2b: { type: Boolean, default: false },
+  b2c: { type: Boolean, default: false }
 }, { timestamps: true });
 
 sellerSchema.pre('save', async function() {

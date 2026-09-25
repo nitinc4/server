@@ -39,7 +39,7 @@ router.get('/', protect, async (req, res) => {
 // @route   POST /api/sellers
 // @desc    Create a new seller (Admin)
 router.post('/', protect, async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, b2b, b2c, creditDays, businessName, status, isVerified, locationId } = req.body;
   try {
     const { Seller: SellerModel } = getModels(req);
     const sellerExists = await SellerModel.findOne({ email });
@@ -48,7 +48,14 @@ router.post('/', protect, async (req, res) => {
     const seller = await SellerModel.create({
       name,
       email,
-      password
+      password,
+      b2b,
+      b2c,
+      creditDays,
+      businessName,
+      storeName: businessName,
+      status,
+      isVerified
     });
 
     res.status(201).json(seller);
@@ -393,7 +400,7 @@ router.put('/:id/verify', protect, async (req, res) => {
 // @route   PUT /api/sellers/:id
 // @desc    Update a seller's details (Admin)
 router.put('/:id', protect, async (req, res) => {
-  const { name, email, phone, password, businessName, businessAddress, gstNumber, panNumber, creditDays, status, isVerified } = req.body;
+  const { name, email, phone, password, businessName, businessAddress, gstNumber, panNumber, creditDays, status, isVerified, b2b, b2c } = req.body;
   try {
     const { Seller: SellerModel } = getModels(req);
     const seller = await SellerModel.findById(req.params.id);
@@ -419,6 +426,8 @@ router.put('/:id', protect, async (req, res) => {
     if (creditDays !== undefined) seller.creditDays = Number(creditDays) || 0;
     if (status !== undefined) seller.status = status;
     if (isVerified !== undefined) seller.isVerified = isVerified;
+    if (b2b !== undefined) seller.b2b = b2b;
+    if (b2c !== undefined) seller.b2c = b2c;
 
     const updatedSeller = await seller.save();
     
