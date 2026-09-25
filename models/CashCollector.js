@@ -50,17 +50,12 @@ const cashCollectorSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-cashCollectorSchema.pre('save', async function(next) {
-  try {
-    if (!this.isModified('password') || !this.password) {
-      return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
+cashCollectorSchema.pre('save', async function() {
+  if (!this.isModified('password') || !this.password) {
+    return;
   }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password method
