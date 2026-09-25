@@ -1624,4 +1624,17 @@ router.put('/:id/return-delivery', protect, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/orders/admin/:id
+// @desc    Admin deletes an order
+router.delete('/admin/:id', protect, async (req, res) => {
+  try {
+    const { Order: OrderModel } = getModels(req);
+    const order = await OrderModel.findByIdAndDelete(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json({ message: 'Order deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
