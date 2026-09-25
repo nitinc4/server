@@ -143,7 +143,7 @@ router.post('/generate', protect, async (req, res) => {
     await newInvoice.save();
     
     // Generate PDF Invoice
-    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
     const chunks = [];
     doc.on('data', chunk => chunks.push(chunk));
     doc.on('end', async () => {
@@ -175,21 +175,39 @@ router.post('/generate', protect, async (req, res) => {
       }
     });
 
-    // Build PDF Content
-    doc.fontSize(20).text('SELLER INVOICE', { align: 'center' }).moveDown();
-    doc.fontSize(12).text(`Seller: ${seller.businessName}`);
-    if (seller.gstNumber) {
-      doc.text(`GSTIN: ${seller.gstNumber}`);
-    }
-    doc.text(`Invoice ID: ${newInvoice._id}`);
-    doc.text(`Date Range: ${start.toDateString()} to ${end.toDateString()}`);
-    doc.text(`Total Orders: ${orderIds.length}`);
-    doc.text(`Total Amount: ₹${totalAmount}`);
-    doc.moveDown();
+    const sellerName = seller ? (seller.businessName || seller.companyName || seller.name || 'Unknown Seller') : 'Unknown Seller';
+    
+    // Header
+    doc.fontSize(22).font('Helvetica-Bold').text('SELLER INVOICE', { align: 'right' });
+    doc.moveDown(1.5);
+
+    // From / To sections
+    doc.fontSize(10).font('Helvetica-Bold').text('FROM:', 40, 90);
+    doc.font('Helvetica').text('SNB TRADING.CO (ZUDO PLATFORM)', 40, 105);
+    doc.text('307 ashrya layout vishweshwaria 7th block', 40, 120);
+    doc.text('Bengaluru, Karnataka 560091', 40, 135);
+    doc.text('GSTIN: 29BQHPG3242G1ZYNO', 40, 150);
+
+    doc.font('Helvetica-Bold').text('BILL TO (SELLER):', 300, 90);
+    doc.font('Helvetica').text(sellerName, 300, 105);
+    if (seller && seller.email) doc.text(`Email: ${seller.email}`, 300, 120);
+    if (seller && seller.phone) doc.text(`Phone: ${seller.phone}`, 300, 135);
+    if (seller && seller.gstNumber) doc.text(`GSTIN: ${seller.gstNumber}`, 300, 150);
+
+    // Meta Details Grid
+    doc.rect(40, 180, 515, 65).stroke('#d1d5db');
+    doc.font('Helvetica-Bold').fontSize(10);
+    doc.text('Invoice ID:', 55, 195).font('Helvetica').text(newInvoice._id.toString(), 140, 195);
+    doc.font('Helvetica-Bold').text('Date Range:', 55, 215).font('Helvetica').text(`${start.toLocaleDateString()} to ${end.toLocaleDateString()}`, 140, 215);
+    
+    doc.font('Helvetica-Bold').text('Status:', 350, 195).font('Helvetica').text(newInvoice.status, 430, 195);
+    doc.font('Helvetica-Bold').text('Total Orders:', 350, 215).font('Helvetica').text(orderIds.length.toString(), 430, 215);
+
+    doc.moveDown(5); // Move cursor down below the rect
 
     const table = {
       title: "Order Breakdown",
-      headers: ["Order ID", "Date", "Amount"],
+      headers: ["Order ID", "Date", "Amount (INR)"],
       rows: validOrders.map(o => [
         o._id.toString(),
         new Date(o.createdAt).toLocaleDateString(),
@@ -202,11 +220,19 @@ router.post('/generate', protect, async (req, res) => {
           const productMatchesName = item.product && item.product.sellerName && seller.name && item.product.sellerName.toLowerCase() === seller.name.toLowerCase();
           const productMatchesStore = item.product && item.product.sellerName && seller.storeName && item.product.sellerName.toLowerCase() === seller.storeName.toLowerCase();
           return matchesSellerObj || matchesProductRef || matchesName || matchesStore || matchesBusiness || productMatchesName || productMatchesStore;
-        }).reduce((sum, i) => sum + (i.normalPrice || i.price) * i.quantity, 0)}`
+        }).reduce((sum, i) => sum + (i.normalPrice || i.price) * i.quantity, 0).toFixed(2)}`
       ])
     };
     
-    await doc.table(table, { width: 500 });
+    await doc.table(table, { 
+      width: 515,
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(10),
+      prepareRow: (row, i) => doc.font("Helvetica").fontSize(10)
+    });
+
+    doc.moveDown(1.5);
+    doc.font('Helvetica-Bold').fontSize(14).text(`Total Net Amount: Rs. ${totalAmount.toFixed(2)}`, { align: 'right' });
+    
     doc.end();
 
     res.status(201).json(newInvoice);
@@ -284,44 +310,64 @@ router.put('/admin/:id/clear', protect, async (req, res) => {
 router.get('/:id/download', protect, async (req, res) => {
   try {
     const { SellerInvoice: InvoiceModel, Seller: SellerModel, Order: OrderModel } = getModels(req);
-    const invoice = await InvoiceModel.findById(req.params.id);
+    const invoice = await InvoiceModel.findById(req.params.id).populate('sellerId');
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
 
+    // Use populated seller
+    const seller = invoice.sellerId;
+    const sellerIdStr = seller ? seller._id.toString() : invoice.sellerId.toString();
+
     // Auth check
-    const isOwner = req.user && req.user._id.toString() === invoice.sellerId.toString();
+    const isOwner = req.user && req.user._id.toString() === sellerIdStr;
     if (!isOwner && !req.admin) {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    const seller = await SellerModel.findById(invoice.sellerId);
     const orders = await OrderModel.find({ _id: { $in: invoice.orders } });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=Invoice_${invoice._id}.pdf`);
 
-    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
     doc.pipe(res);
 
-    doc.fontSize(20).text('SELLER INVOICE', { align: 'center' }).moveDown();
-    doc.fontSize(12).text(`Seller: ${seller ? seller.businessName : 'Unknown Seller'}`);
-    if (seller && seller.gstNumber) {
-      doc.text(`GSTIN: ${seller.gstNumber}`);
-    }
-    doc.text(`Invoice ID: ${invoice._id}`);
-    doc.text(`Status: ${invoice.status}`);
-    doc.text(`Date Range: ${new Date(invoice.startDate).toDateString()} to ${new Date(invoice.endDate).toDateString()}`);
-    doc.text(`Total Orders: ${invoice.orderCount}`);
-    doc.text(`Total Amount: Rs. ${invoice.totalAmount}`);
-    doc.moveDown();
+    const sellerName = seller ? (seller.businessName || seller.companyName || seller.name || 'Unknown Seller') : 'Unknown Seller';
+    
+    // Header
+    doc.fontSize(22).font('Helvetica-Bold').text('SELLER INVOICE', { align: 'right' });
+    doc.moveDown(1.5);
+
+    // From / To sections
+    doc.fontSize(10).font('Helvetica-Bold').text('FROM:', 40, 90);
+    doc.font('Helvetica').text('SNB TRADING.CO (ZUDO PLATFORM)', 40, 105);
+    doc.text('307 ashrya layout vishweshwaria 7th block', 40, 120);
+    doc.text('Bengaluru, Karnataka 560091', 40, 135);
+    doc.text('GSTIN: 29BQHPG3242G1ZYNO', 40, 150);
+
+    doc.font('Helvetica-Bold').text('BILL TO (SELLER):', 300, 90);
+    doc.font('Helvetica').text(sellerName, 300, 105);
+    if (seller && seller.email) doc.text(`Email: ${seller.email}`, 300, 120);
+    if (seller && seller.phone) doc.text(`Phone: ${seller.phone}`, 300, 135);
+    if (seller && seller.gstNumber) doc.text(`GSTIN: ${seller.gstNumber}`, 300, 150);
+
+    // Meta Details Grid
+    doc.rect(40, 180, 515, 65).stroke('#d1d5db');
+    doc.font('Helvetica-Bold').fontSize(10);
+    doc.text('Invoice ID:', 55, 195).font('Helvetica').text(invoice._id.toString(), 140, 195);
+    doc.font('Helvetica-Bold').text('Date Range:', 55, 215).font('Helvetica').text(`${new Date(invoice.startDate).toLocaleDateString()} to ${new Date(invoice.endDate).toLocaleDateString()}`, 140, 215);
+    
+    doc.font('Helvetica-Bold').text('Status:', 350, 195).font('Helvetica').text(invoice.status, 430, 195);
+    doc.font('Helvetica-Bold').text('Total Orders:', 350, 215).font('Helvetica').text(invoice.orderCount.toString(), 430, 215);
+
+    doc.moveDown(5); // Move cursor down below the rect
 
     const table = {
       title: "Order Breakdown",
-      headers: ["Order ID", "Date", "Amount"],
+      headers: ["Order ID", "Date", "Amount (INR)"],
       rows: orders.map(o => [
         o._id.toString(),
         new Date(o.createdAt).toLocaleDateString(),
         `Rs. ${o.items.filter(item => {
-          const sellerIdStr = invoice.sellerId.toString();
           const matchesSellerObj = item.seller && item.seller.sellerId && item.seller.sellerId.toString() === sellerIdStr;
           const matchesProductRef = item.productId && item.productId.sellerId && item.productId.sellerId.toString() === sellerIdStr;
           const matchesName = item.sellerName && seller && seller.name && item.sellerName.toLowerCase() === seller.name.toLowerCase();
@@ -330,11 +376,19 @@ router.get('/:id/download', protect, async (req, res) => {
           const productMatchesName = item.product && item.product.sellerName && seller && seller.name && item.product.sellerName.toLowerCase() === seller.name.toLowerCase();
           const productMatchesStore = item.product && item.product.sellerName && seller && seller.storeName && item.product.sellerName.toLowerCase() === seller.storeName.toLowerCase();
           return matchesSellerObj || matchesProductRef || matchesName || matchesStore || matchesBusiness || productMatchesName || productMatchesStore;
-        }).reduce((sum, i) => sum + (i.normalPrice || i.price) * i.quantity, 0)}`
+        }).reduce((sum, i) => sum + (i.normalPrice || i.price) * i.quantity, 0).toFixed(2)}`
       ])
     };
     
-    await doc.table(table, { width: 500 });
+    await doc.table(table, { 
+      width: 515,
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(10),
+      prepareRow: (row, i) => doc.font("Helvetica").fontSize(10)
+    });
+
+    doc.moveDown(1.5);
+    doc.font('Helvetica-Bold').fontSize(14).text(`Total Net Amount: Rs. ${invoice.totalAmount.toFixed(2)}`, { align: 'right' });
+    
     doc.end();
   } catch (error) {
     res.status(500).json({ message: error.message });
