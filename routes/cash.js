@@ -40,7 +40,19 @@ router.post('/', async (req, res) => {
       paymentMethod
     });
 
-    const transaction = await newTransaction.save();
+    let transaction;
+    try {
+      transaction = await newTransaction.save();
+    } catch (saveErr) {
+      if (saveErr.code === 11000 && saveErr.message.includes('phone_1')) {
+        console.log('Dropping legacy phone_1 unique index from cashcollectors...');
+        await CashCollectorModel.collection.dropIndex('phone_1').catch(e => console.log('Error dropping index:', e.message));
+        transaction = await newTransaction.save();
+      } else {
+        throw saveErr;
+      }
+    }
+
     res.json(transaction);
   } catch (err) {
     console.error('Error logging transaction:', err);
