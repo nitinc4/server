@@ -38,9 +38,16 @@ if (!fs.existsSync(uploadDir)) {
     console.error('Failed to create upload directory:', err.message);
   }
 }
-app.use('/api/uploads', express.static(uploadDir));
-app.use('/api/upload', express.static(uploadDir));
-app.use('/uploads', express.static(uploadDir)); // Maintain backward compatibility
+const staticOptions = {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.jfif')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    }
+  }
+};
+app.use('/api/uploads', express.static(uploadDir, staticOptions));
+app.use('/api/upload', express.static(uploadDir, staticOptions));
+app.use('/uploads', express.static(uploadDir, staticOptions)); // Maintain backward compatibility
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
