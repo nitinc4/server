@@ -15,7 +15,11 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    let ext = path.extname(file.originalname).toLowerCase();
+    if (ext === '.jfif') {
+      ext = '.jpeg';
+    }
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
   }
 });
 
