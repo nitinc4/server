@@ -63,4 +63,34 @@ router.post('/sub', protect, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/categories/:id
+// @desc    Delete a category
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const { Category } = getModels(req);
+    const category = await Category.findByIdAndDelete(req.params.id);
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    res.json({ message: 'Category removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @route   DELETE /api/categories/sub/:id
+// @desc    Delete a subcategory
+router.delete('/sub/:id', protect, async (req, res) => {
+  try {
+    const { SubCategory } = getModels(req);
+    const subCategory = await SubCategory.findByIdAndDelete(req.params.id);
+    if (!subCategory) {
+      return res.status(404).json({ message: 'Subcategory not found' });
+    }
+    res.json({ message: 'Subcategory removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
