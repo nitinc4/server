@@ -263,7 +263,15 @@ router.post('/', protect, upload.fields([{ name: 'image', maxCount: 1 }, { name:
     if (req.files && req.files['pdf']) {
       pdfUrl = `${productionDomain}/uploads/${req.files['pdf'][0].filename}`;
     }
-    const { Product } = getModels(req);
+    const { Product, Seller, User } = getModels(req);
+
+    let finalSellerName = 'Zudo Official';
+    if (sellerId) {
+      let seller = await Seller.findById(sellerId).select('businessName storeName name');
+      if (!seller) seller = await User.findById(sellerId).select('businessName name');
+      if (seller) finalSellerName = seller.businessName || seller.storeName || seller.name;
+    }
+
     const product = await Product.create({
       name,
       categoryId,
@@ -274,6 +282,7 @@ router.post('/', protect, upload.fields([{ name: 'image', maxCount: 1 }, { name:
       moq,
       unit,
       sellerId, // Save sellerId
+      sellerName: finalSellerName, // Save sellerName
       stock: stock || 0, // Save stock
       description,
       imageUrl,

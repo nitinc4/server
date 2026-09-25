@@ -210,12 +210,23 @@ router.put('/profile', protect, async (req, res) => {
 router.get('/products', protect, async (req, res) => {
   try {
     const { Product: ProductModel } = getModels(req);
-    const products = await ProductModel.find({ 
+    let products = await ProductModel.find({ 
         $or: [
             { sellerId: req.user._id.toString() },
             { seller: req.user._id }
         ]
-    }).populate('categoryId subCategoryId');
+    }).populate('categoryId subCategoryId').lean();
+
+    const sellerName = req.user.businessName || req.user.storeName || req.user.name;
+    products = products.map(p => ({
+      ...p,
+      sellerName: p.sellerName && p.sellerName !== 'Zudo Official' ? p.sellerName : sellerName,
+      seller: {
+        _id: req.user._id,
+        name: sellerName
+      }
+    }));
+
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
