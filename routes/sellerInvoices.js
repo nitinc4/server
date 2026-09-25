@@ -310,18 +310,19 @@ router.put('/admin/:id/clear', protect, async (req, res) => {
 router.get('/:id/download', protect, async (req, res) => {
   try {
     const { SellerInvoice: InvoiceModel, Seller: SellerModel, Order: OrderModel } = getModels(req);
-    const invoice = await InvoiceModel.findById(req.params.id).populate('sellerId');
+    const invoice = await InvoiceModel.findById(req.params.id);
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
 
-    // Use populated seller
-    const seller = invoice.sellerId;
-    const sellerIdStr = seller ? seller._id.toString() : invoice.sellerId.toString();
+    const sellerIdStr = invoice.sellerId.toString();
 
     // Auth check
     const isOwner = req.user && req.user._id.toString() === sellerIdStr;
     if (!isOwner && !req.admin) {
       return res.status(403).json({ message: 'Not authorized' });
     }
+
+    // Safely fetch seller (could be deleted)
+    const seller = await SellerModel.findById(invoice.sellerId);
 
     const orders = await OrderModel.find({ _id: { $in: invoice.orders } });
 
