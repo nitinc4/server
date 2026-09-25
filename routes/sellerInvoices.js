@@ -288,7 +288,7 @@ router.get('/:id/download', protect, async (req, res) => {
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
 
     // Auth check
-    const isOwner = req.user._id.toString() === invoice.sellerId.toString();
+    const isOwner = req.user && req.user._id.toString() === invoice.sellerId.toString();
     if (!isOwner && !req.admin) {
       return res.status(403).json({ message: 'Not authorized' });
     }
@@ -303,8 +303,8 @@ router.get('/:id/download', protect, async (req, res) => {
     doc.pipe(res);
 
     doc.fontSize(20).text('SELLER INVOICE', { align: 'center' }).moveDown();
-    doc.fontSize(12).text(`Seller: ${seller.businessName}`);
-    if (seller.gstNumber) {
+    doc.fontSize(12).text(`Seller: ${seller ? seller.businessName : 'Unknown Seller'}`);
+    if (seller && seller.gstNumber) {
       doc.text(`GSTIN: ${seller.gstNumber}`);
     }
     doc.text(`Invoice ID: ${invoice._id}`);
@@ -321,13 +321,14 @@ router.get('/:id/download', protect, async (req, res) => {
         o._id.toString(),
         new Date(o.createdAt).toLocaleDateString(),
         `Rs. ${o.items.filter(item => {
-          const matchesSellerObj = item.seller && item.seller.sellerId && item.seller.sellerId.toString() === seller._id.toString();
-          const matchesProductRef = item.productId && item.productId.sellerId && item.productId.sellerId.toString() === seller._id.toString();
-          const matchesName = item.sellerName && seller.name && item.sellerName.toLowerCase() === seller.name.toLowerCase();
-          const matchesStore = item.sellerName && seller.storeName && item.sellerName.toLowerCase() === seller.storeName.toLowerCase();
-          const matchesBusiness = item.sellerName && seller.businessName && item.sellerName.toLowerCase() === seller.businessName.toLowerCase();
-          const productMatchesName = item.product && item.product.sellerName && seller.name && item.product.sellerName.toLowerCase() === seller.name.toLowerCase();
-          const productMatchesStore = item.product && item.product.sellerName && seller.storeName && item.product.sellerName.toLowerCase() === seller.storeName.toLowerCase();
+          const sellerIdStr = invoice.sellerId.toString();
+          const matchesSellerObj = item.seller && item.seller.sellerId && item.seller.sellerId.toString() === sellerIdStr;
+          const matchesProductRef = item.productId && item.productId.sellerId && item.productId.sellerId.toString() === sellerIdStr;
+          const matchesName = item.sellerName && seller && seller.name && item.sellerName.toLowerCase() === seller.name.toLowerCase();
+          const matchesStore = item.sellerName && seller && seller.storeName && item.sellerName.toLowerCase() === seller.storeName.toLowerCase();
+          const matchesBusiness = item.sellerName && seller && seller.businessName && item.sellerName.toLowerCase() === seller.businessName.toLowerCase();
+          const productMatchesName = item.product && item.product.sellerName && seller && seller.name && item.product.sellerName.toLowerCase() === seller.name.toLowerCase();
+          const productMatchesStore = item.product && item.product.sellerName && seller && seller.storeName && item.product.sellerName.toLowerCase() === seller.storeName.toLowerCase();
           return matchesSellerObj || matchesProductRef || matchesName || matchesStore || matchesBusiness || productMatchesName || productMatchesStore;
         }).reduce((sum, i) => sum + (i.normalPrice || i.price) * i.quantity, 0)}`
       ])
