@@ -221,7 +221,39 @@ const generateOTP = (length = 4) => {
 router.get('/slots', protect, async (req, res) => {
   try {
     const { DeliverySlot: DeliverySlotModel } = req.models;
-    const slots = await DeliverySlotModel.find({ isActive: true });
+    const LocationModel = req.models?.Location || require('../models/Location');
+    
+    let slots = await DeliverySlotModel.find({ isActive: true });
+
+    let locationId = req.locationId || req.user.locationId;
+    let isBangalore = true;
+    if (locationId) {
+      const loc = await LocationModel.findById(locationId);
+      if (loc && !loc.name.toLowerCase().includes('bangalore') && !loc.name.toLowerCase().includes('bengaluru')) {
+        isBangalore = false;
+      }
+    }
+
+    if (!isBangalore) {
+      const currentDay = new Date().getDay(); // 0 is Sunday, 6 is Saturday
+      let deliveryDay = '';
+      if ([6, 0, 1, 2].includes(currentDay)) { // Saturday, Sunday, Monday, Tuesday
+        deliveryDay = 'Wednesday';
+      } else { // Wednesday, Thursday, Friday
+        deliveryDay = 'Saturday';
+      }
+      
+      slots = slots.map(slot => {
+        let slotObj = slot.toObject();
+        if (slotObj.startTime && slotObj.startTime !== '*') {
+          if (!slotObj.startTime.includes(deliveryDay)) {
+             slotObj.startTime = `${deliveryDay}, ${slotObj.startTime}`;
+          }
+        }
+        return slotObj;
+      });
+    }
+
     res.json(slots);
   } catch (error) {
     console.error('Fetch slots error:', error);
@@ -503,6 +535,31 @@ router.post('/', protect, async (req, res) => {
       pickupCode: isMultiSeller ? generateOTP(6) : globalPickupOtp
     }));
 
+    let finalDeliverySlot = deliverySlot;
+    let locationIdForCheck = req.locationId || req.user.locationId;
+    let isBangalore = true;
+    if (locationIdForCheck && finalDeliverySlot) {
+      const LocationModel = req.models?.Location || require('../models/Location');
+      const loc = await LocationModel.findById(locationIdForCheck);
+      if (loc && !loc.name.toLowerCase().includes('bangalore') && !loc.name.toLowerCase().includes('bengaluru')) {
+        isBangalore = false;
+      }
+    }
+
+    if (!isBangalore && finalDeliverySlot && finalDeliverySlot.startTime) {
+      const currentDay = new Date().getDay(); // 0 is Sunday, 6 is Saturday
+      let deliveryDay = '';
+      if ([6, 0, 1, 2].includes(currentDay)) { // Saturday, Sunday, Monday, Tuesday
+        deliveryDay = 'Wednesday';
+      } else { // Wednesday, Thursday, Friday
+        deliveryDay = 'Saturday';
+      }
+      
+      if (finalDeliverySlot.startTime !== '*' && !finalDeliverySlot.startTime.includes(deliveryDay)) {
+        finalDeliverySlot.startTime = `${deliveryDay}, ${finalDeliverySlot.startTime}`;
+      }
+    }
+
     const order = new OrderModel({
       userId: targetUserId,
       type: targetUserRole === 'b2b' ? 'b2b' : 'b2c',
@@ -517,7 +574,7 @@ router.post('/', protect, async (req, res) => {
       pickupCode: globalPickupOtp,
       sellerPickups: sellerPickups,
       deliveryOtp: generateOTP(4),
-      deliverySlot: deliverySlot,
+      deliverySlot: finalDeliverySlot,
       placedBySalesAssociate: isSalesOrder,
       salesAssociateId: salesAssociateId
     });
