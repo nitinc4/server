@@ -4,9 +4,20 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
+const { init: initSocket } = require('./utils/socket');
+const io = initSocket(server);
+
+io.on('connection', (socket) => {
+  console.log('Client connected to socket.io');
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
 
 // Middleware
 app.use(cors({
@@ -48,6 +59,9 @@ const staticOptions = {
 app.use('/api/uploads', express.static(uploadDir, staticOptions));
 app.use('/api/upload', express.static(uploadDir, staticOptions));
 app.use('/uploads', express.static(uploadDir, staticOptions)); // Maintain backward compatibility
+// Apply Socket Mongoose Plugin
+const socketPlugin = require('./utils/socketPlugin');
+mongoose.plugin(socketPlugin);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -111,6 +125,6 @@ app.use((err, req, res, next) => {
 });
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
