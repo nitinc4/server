@@ -6,7 +6,7 @@ const adminSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { 
     type: String, 
-    enum: ['super_admin', 'normal_admin', 'sales', 'accounting', 'manager', 'logistics', 'cash_collector'], 
+    enum: ['super_admin', 'normal_admin', 'sales', 'accounting', 'manager', 'logistics', 'cash_collector', 'b2b_admin', 'b2c_admin'], 
     default: 'manager' 
   },
   name: { type: String, required: true },
@@ -27,7 +27,7 @@ const adminSchema = new mongoose.Schema({
       'view_dashboard', 'manage_products', 'manage_categories', 'manage_subcategories',
       'manage_drivers', 'manage_sellers', 'manage_users', 'manage_b2b_verification',
       'manage_orders', 'manage_deliveries', 'manage_reviews', 'manage_bulk_upload',
-      'manage_cash', 'manage_admins', 'manage_locations', 'manage_profile'
+      'manage_cash', 'manage_admins', 'manage_locations', 'manage_profile', 'manage_invoices'
     ]
   }],
   tokenVersion: { type: Number, default: 0 },
