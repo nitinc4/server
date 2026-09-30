@@ -194,6 +194,8 @@ router.put('/profile', protect, async (req, res) => {
     user.tradeLicenseDoc = req.body.tradeLicenseDoc || user.tradeLicenseDoc;
     user.rmcAmpcDoc = req.body.rmcAmpcDoc || user.rmcAmpcDoc;
     user.foodLicenseDoc = req.body.foodLicenseDoc || user.foodLicenseDoc;
+    user.qrCodeDoc = req.body.qrCodeDoc || user.qrCodeDoc;
+    user.qrOption = req.body.qrOption || user.qrOption;
     
     // Mark profile as complete
     user.isProfileComplete = true;
