@@ -1714,4 +1714,24 @@ router.delete('/admin/:id', protect, async (req, res) => {
   }
 });
 
+// @route   PUT /api/orders/:id/qrcode
+// @desc    Update order QR Code (Seller)
+// @access  Private (Seller/Admin)
+router.put('/:id/qrcode', protect, async (req, res) => {
+  const { qrCodeDoc, qrOption } = req.body;
+  try {
+    const { Order: OrderModel } = getModels(req);
+    const order = await OrderModel.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    
+    if (qrCodeDoc !== undefined) order.qrCodeDoc = qrCodeDoc;
+    if (qrOption !== undefined) order.qrOption = qrOption;
+    
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

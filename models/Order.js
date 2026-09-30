@@ -173,6 +173,14 @@ const orderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  qrCodeDoc: {
+    type: String,
+    default: null
+  },
+  qrOption: {
+    type: String,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
