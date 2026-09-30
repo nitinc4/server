@@ -635,7 +635,7 @@ router.get('/admin/all', protect, async (req, res) => {
         .populate('driverId', 'name phone')
         .populate('returnDriverId', 'name phone')
         .populate('cashPersonId', 'name phone')
-        .populate('items.productId')
+        .populate('items.productId').populate('items.seller.sellerId', 'name qrCodeDoc qrOption companyName').populate('sellerId', 'name qrCodeDoc qrOption companyName')
         .sort({ createdAt: -1 });
       res.json(orders);
     }
