@@ -626,7 +626,7 @@ router.get('/admin/all', protect, async (req, res) => {
 
     if (!req.locationId) {
       const { aggregateGET } = require('../utils/aggregator');
-      const orders = await aggregateGET('Order', req, orderFilter, ['userId', 'driverId', 'cashPersonId', 'items.productId'], '', { createdAt: -1 });
+      const orders = await aggregateGET('Order', req, orderFilter, ['userId', 'driverId', 'cashPersonId', 'sellerId', 'items.productId'], '', { createdAt: -1 });
       res.json(orders);
     } else {
       const { Order: OrderModel } = getModels(req);
@@ -635,7 +635,7 @@ router.get('/admin/all', protect, async (req, res) => {
         .populate('driverId', 'name phone')
         .populate('returnDriverId', 'name phone')
         .populate('cashPersonId', 'name phone')
-        .populate('items.productId').populate('items.seller.sellerId', 'name qrCodeDoc qrOption companyName').populate('sellerId', 'name qrCodeDoc qrOption companyName')
+        .populate('items.productId').populate('sellerId', 'name qrCodeDoc qrOption companyName')
         .sort({ createdAt: -1 });
       res.json(orders);
     }
