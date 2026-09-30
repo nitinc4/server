@@ -19,6 +19,8 @@ const sellerSchema = new mongoose.Schema({
   tradeLicenseDoc: { type: String },
   rmcAmpcDoc: { type: String },
   foodLicenseDoc: { type: String },
+  qrCodeDoc: { type: String },
+  qrOption: { type: String },
   status: { 
     type: String, 
     enum: ['pending', 'approved', 'rejected'], 
