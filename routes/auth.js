@@ -167,6 +167,27 @@ router.post('/login', async (req, res) => {
         }
         if (admin) isTenantAdmin = true;
       }
+    } else if (!admin) {
+      // 3. Scan all tenant databases if admin not found globally and no locationId provided
+      logToFile(`Scanning all tenant DBs for user...`);
+      const LocationModel = req.models?.Location || Location;
+      const locations = await LocationModel.find({ isActive: true });
+      for (const loc of locations) {
+        const tempDbName = `zudo-${loc.city.toLowerCase().replace(/\s+/g, '-')}`;
+        const tenantConn = await connectDBByLocation(loc._id.toString(), tempDbName);
+        const TenantAdmin = tenantConn.models.Admin || tenantConn.model('Admin', Admin.schema);
+        admin = await TenantAdmin.findOne({ email: new RegExp(`^${emailToSearch}$`, 'i') });
+        if (!admin) {
+          const TenantSales = tenantConn.models.Sales || tenantConn.model('Sales', Admin.schema, 'sales');
+          admin = await TenantSales.findOne({ email: new RegExp(`^${emailToSearch}$`, 'i') });
+        }
+        if (admin) {
+          tenantDbName = tempDbName;
+          isTenantAdmin = true;
+          logToFile(`Found user in tenant DB during scan: ${tenantDbName}`);
+          break;
+        }
+      }
     }
 
     if (!admin) {
