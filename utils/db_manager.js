@@ -75,6 +75,11 @@ const connectDBByLocation = async (locationId, customName = null) => {
     dbName = dbName.replace('zudo-zudo-', 'zudo-');
   }
 
+  // Map Bangalore to Bengaluru explicitly to fix database mismatch
+  if (dbName === 'zudo-bangalore') {
+    dbName = 'zudo-bengaluru';
+  }
+
   if (connections[dbName]) {
     return connections[dbName];
   }
