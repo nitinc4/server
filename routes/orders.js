@@ -644,6 +644,26 @@ router.get('/admin/all', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/orders/bulk-print-status
+// @desc    Update isPrinted status for multiple orders
+// @access  Private
+router.post('/bulk-print-status', protect, async (req, res) => {
+  try {
+    const { orderIds } = req.body;
+    if (!orderIds || !Array.isArray(orderIds)) {
+      return res.status(400).json({ message: 'orderIds array is required' });
+    }
+    const { Order: OrderModel } = getModels(req);
+    await OrderModel.updateMany(
+      { _id: { $in: orderIds } },
+      { $set: { isPrinted: true } }
+    );
+    res.json({ message: 'Orders marked as printed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // @route   GET /api/orders/assigned-cash
 // @desc    Get orders assigned to the logged-in cash collector
 router.get('/assigned-cash', protect, async (req, res) => {

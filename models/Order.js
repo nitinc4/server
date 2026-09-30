@@ -169,6 +169,10 @@ const orderSchema = new mongoose.Schema({
     ref: 'Admin',
     default: null
   },
+  isPrinted: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
