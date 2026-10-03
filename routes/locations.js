@@ -88,6 +88,9 @@ router.post('/', protect, superAdmin, async (req, res) => {
     if (!data.city) {
       return res.status(400).json({ message: 'City is required' });
     }
+    if (!data.state) {
+      return res.status(400).json({ message: 'State is required' });
+    }
 
     // Clean up city name: lower case, hyphenated, and strip any existing 'zudo-' prefix
     let cityClean = data.city.trim().toLowerCase().replace(/\s+/g, '-');
