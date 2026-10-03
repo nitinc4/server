@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
+const mongoose = require('mongoose');
 
 const getModels = (req) => req.models || {
   Commission: require('../models/Commission'),
@@ -29,26 +30,71 @@ router.get('/', protect, async (req, res) => {
 router.put('/category/:categoryId', protect, async (req, res) => {
   const { categoryId } = req.params;
   const { commissions } = req.body; // Array of { unit, commissionType, commissionValue }
-  try {
-    const { Commission } = getModels(req);
-    
-    // 1. Delete all existing rules for this category to overwrite
-    await Commission.deleteMany({ categoryId });
-
-    // 2. Insert new ones
-    if (commissions && commissions.length > 0) {
-      const rulesToInsert = commissions.map(comm => ({
-        categoryId,
-        unit: comm.unit,
-        commissionType: comm.commissionType,
-        commissionValue: comm.commissionValue,
-        pincode: comm.pincode || 'All'
-      }));
-      await Commission.insertMany(rulesToInsert);
+  
+  // Filter unique rules to prevent unique index violation
+  const rulesToInsert = [];
+  if (commissions && commissions.length > 0) {
+    const seen = new Set();
+    for (const comm of commissions) {
+      const unit = comm.unit;
+      const pincode = comm.pincode || 'All';
+      const key = `${unit.toLowerCase()}-${pincode.toLowerCase()}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        rulesToInsert.push({
+          categoryId,
+          unit,
+          commissionType: comm.commissionType,
+          commissionValue: comm.commissionValue,
+          pincode
+        });
+      }
     }
+  }
 
-    const updated = await Commission.find({ categoryId });
-    res.json(updated);
+  try {
+    if (!req.locationId) {
+      // Global Access - Update commissions across all active tenant databases
+      const centralConn = await mongoose.createConnection(process.env.MONGODB_URI).asPromise();
+      const CentralLocation = centralConn.models.Location || centralConn.model('Location', require('../models/Location').schema);
+      const locations = await CentralLocation.find({ isActive: true }).lean();
+      await centralConn.close();
+
+      for (const loc of locations) {
+        try {
+          const { connectDBByLocation } = require('../utils/db_manager');
+          const cityClean = loc.city.toLowerCase().replace(/\s+/g, '-');
+          const dbName = `zudo-${cityClean}`;
+          const connection = await connectDBByLocation(loc._id.toString(), dbName);
+          
+          const Commission = connection.models.Commission || connection.model('Commission', require('../models/Commission').schema);
+          
+          // 1. Delete all existing rules for this category
+          await Commission.deleteMany({ categoryId });
+
+          // 2. Insert new ones
+          if (rulesToInsert.length > 0) {
+            await Commission.insertMany(rulesToInsert);
+          }
+        } catch (err) {
+          console.error(`Failed to update commissions for ${loc.city}:`, err.message);
+        }
+      }
+      return res.json({ message: 'Commissions updated successfully across all branches.' });
+    } else {
+      const { Commission } = getModels(req);
+      
+      // 1. Delete all existing rules for this category to overwrite
+      await Commission.deleteMany({ categoryId });
+
+      // 2. Insert new ones
+      if (rulesToInsert.length > 0) {
+        await Commission.insertMany(rulesToInsert);
+      }
+
+      const updated = await Commission.find({ categoryId });
+      res.json(updated);
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
